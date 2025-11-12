@@ -1,0 +1,42 @@
+# Android Studio
+.idea/
+*.iml
+captures/
+
+# Eclipse
+.classpath
+.project
+
+# Mac File Store
+.DS_Store
+
+# Gradle Files
+.gradle/
+.kotlin/
+build/
+
+# Built Application Files
+*.apk
+*.ap_
+*.aab
+
+# Java Class Files
+*.class
+
+# Dex VM Files
+*.dex
+
+*/lint.xml
+
+# Local Configuration
+local.properties
+
+# Log Files
+.log
+
+# Keystore files
+*.jks
+*.keystore
+
+# Android Profiling
+*.hprof
