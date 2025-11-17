@@ -41,3 +41,4 @@ include(":features:detail:detail-ui")
 // Favorites feature modules
 include(":features:favorites:favorites-data")
 include(":features:favorites:favorites-domain")
+include(":features:favorites:favorites-ui")

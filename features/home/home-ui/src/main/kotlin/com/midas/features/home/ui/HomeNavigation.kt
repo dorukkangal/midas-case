@@ -23,9 +23,7 @@ fun NavGraphBuilder.home(navController: NavController) {
             uiState = uiState,
             searchQuery = searchQuery,
             onCoinClick = { navController.navigate(Routes.Detail(it.id)) },
-            onFavoritesClick = {
-                // TODO: Navigate to favorites screen
-            },
+            onFavoritesClick = { navController.navigate(Routes.Favorites) },
             onSearchQueryChange = { viewModel.handleAction(HomeUiAction.SearchCoins(it)) },
             onClearSearch = { viewModel.handleAction(HomeUiAction.ClearSearch) },
             onRefresh = { viewModel.handleAction(HomeUiAction.RefreshData) },

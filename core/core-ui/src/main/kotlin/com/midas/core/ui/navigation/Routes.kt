@@ -22,4 +22,10 @@ sealed class Routes {
     data class Detail(
         val coinId: String
     ) : Routes()
+
+    /**
+     * Favorites screen - User's saved favorite coins
+     */
+    @Serializable
+    data object Favorites : Routes()
 }
