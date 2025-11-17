@@ -31,3 +31,4 @@ include(":core:core-util")
 // Home feature modules
 include(":features:home:home-data")
 include(":features:home:home-domain")
+include(":features:home:home-ui")

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="favorites">Favorites</string>
+    <string name="all_crypto_currencies">All Cryptocurrencies</string>
+    <string name="trending">🔥 Trending</string>
+    <string name="search_results">Search Results</string>
+    <string name="no_results_found">No results found</string>
+    <string name="search_cryptocurrencies">Search cryptocurrencies…</string>
+    <string name="search">Search</string>
+    <string name="clear">Clear</string>
+</resources>

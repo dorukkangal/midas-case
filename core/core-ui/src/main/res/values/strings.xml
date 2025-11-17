@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Error -->
+    <string name="unknown_error">Unknown error</string>
+    <string name="back">Back</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="retry">Retry</string>
+    <string name="remove">Remove</string>
+</resources>

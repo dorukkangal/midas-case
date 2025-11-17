@@ -46,6 +46,9 @@ android {
 }
 
 dependencies {
+    // Feature modules - UI
+    implementation(project(":features:home:home-ui"))
+
     // Feature modules - Data
     implementation(project(":features:home:home-data"))
 
@@ -69,6 +72,7 @@ dependencies {
 
     // Dagger
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
