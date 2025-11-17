@@ -20,9 +20,35 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("../signing/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
+        create("release") {
+            storeFile = file("../signing/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
-        release {
+        debug {
+            isDebuggable = true
             isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
+
+        release {
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -49,6 +75,7 @@ dependencies {
     // Feature modules - UI
     implementation(project(":features:home:home-ui"))
     implementation(project(":features:detail:detail-ui"))
+    implementation(project(":features:favorites:favorites-ui"))
 
     // Feature modules - Data
     implementation(project(":features:home:home-data"))
@@ -68,10 +95,7 @@ dependencies {
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
+    implementation(libs.bundles.compose)
 
     // Dagger
     implementation(libs.hilt.android)
