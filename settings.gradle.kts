@@ -26,3 +26,6 @@ include(":app")
 include(":core:core-database")
 include(":core:core-network")
 include(":core:core-ui")
+
+// Home feature modules
+include(":features:home:home-domain")
