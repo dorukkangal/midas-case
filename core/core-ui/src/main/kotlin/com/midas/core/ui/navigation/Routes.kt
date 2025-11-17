@@ -12,4 +12,14 @@ sealed class Routes {
      */
     @Serializable
     data object Home : Routes()
+
+    /**
+     * Coin detail screen
+     *
+     * @param coinId The unique identifier of the coin to display
+     */
+    @Serializable
+    data class Detail(
+        val coinId: String
+    ) : Routes()
 }

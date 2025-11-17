@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Detail Screen -->
+    <string name="coin_detail">Coin Detail</string>
+    <string name="loading_coin_details">Loading coin details…</string>
+    <string name="market_cap_rank">Rank #%1$d</string>
+    <string name="price_information">Price Information</string>
+    <string name="current_price">Current Price</string>
+    <string name="last_day_change">24h Change</string>
+    <string name="last_week_change">7d Change</string>
+    <string name="last_month_change_change">30d Change</string>
+    <string name="highest_value_in_last_day">24h High</string>
+    <string name="lowest_value_in_last_day">24h Low</string>
+    <string name="market_statistics">Market Statistics</string>
+    <string name="market_cap">Market Cap</string>
+    <string name="last_day_volume">24h Volume</string>
+    <string name="circulating_supply">Circulating Supply</string>
+    <string name="total_supply">Total Supply</string>
+    <string name="max_supply">Max Supply</string>
+    <string name="about">About</string>
+    <string name="categories">Categories</string>
+    <string name="additional_information">Additional Information</string>
+    <string name="genesis_date">Genesis Date</string>
+    <string name="favorite">Favorite</string>
+    <string name="failed_to_update_favorites">Failed to update favorites</string>
+</resources>

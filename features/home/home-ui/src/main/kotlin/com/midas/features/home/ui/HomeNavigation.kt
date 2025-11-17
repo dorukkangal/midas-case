@@ -22,9 +22,7 @@ fun NavGraphBuilder.home(navController: NavController) {
         HomeScreen(
             uiState = uiState,
             searchQuery = searchQuery,
-            onCoinClick = {
-                // TODO: Navigate to details screen
-            },
+            onCoinClick = { navController.navigate(Routes.Detail(it.id)) },
             onFavoritesClick = {
                 // TODO: Navigate to favorites screen
             },
