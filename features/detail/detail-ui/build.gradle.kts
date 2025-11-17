@@ -48,6 +48,7 @@ dependencies {
     // Feature modules
     implementation(project(":features:home:home-domain"))
     implementation(project(":features:detail:detail-domain"))
+    implementation(project(":features:favorites:favorites-domain"))
 
     // Core modules
     implementation(project(":core:core-ui"))
