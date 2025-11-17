@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.midas.core.database"
+    namespace = "com.midas.features.favorites.data"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -41,11 +41,19 @@ android {
 }
 
 dependencies {
-    implementation(project(":features:favorites:favorites-data"))
+    implementation(project(":features:favorites:favorites-domain"))
+    implementation(project(":features:home:home-domain"))
 
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // Unit testing
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
 }
