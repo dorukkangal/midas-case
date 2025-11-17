@@ -21,3 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "midas-case"
 include(":app")
+
+// Core modules
+include(":core:core-network")
