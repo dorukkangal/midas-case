@@ -47,6 +47,7 @@ android {
 
 dependencies {
     // Core modules
+    implementation(project(":core:core-database"))
     implementation(project(":core:core-network"))
 
     // AndroidX Core

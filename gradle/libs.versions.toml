@@ -27,6 +27,9 @@ javaxInjectVersion = "1"
 # Ktor
 ktorVersion = "3.3.2"
 
+# Room
+roomVersion = "2.8.3"
+
 # Coroutines
 coroutinesVersion = "1.10.2"
 
@@ -73,6 +76,11 @@ ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-conte
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktorVersion" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
 
+# Database
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationVersion" }
 
@@ -90,4 +98,9 @@ ktor = [
     "ktor-serialization-kotlinx-json",
     "kotlinx-serialization-json",
     "kotlinx-coroutines-core",
+]
+
+room = [
+    "room-runtime",
+    "room-ktx",
 ]

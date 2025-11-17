@@ -23,4 +23,5 @@ rootProject.name = "midas-case"
 include(":app")
 
 // Core modules
+include(":core:core-database")
 include(":core:core-network")
