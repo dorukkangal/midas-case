@@ -46,10 +46,14 @@ android {
 }
 
 dependencies {
+    // Feature modules - Data
+    implementation(project(":features:home:home-data"))
+
     // Core modules
     implementation(project(":core:core-database"))
     implementation(project(":core:core-network"))
     implementation(project(":core:core-ui"))
+    implementation(project(":core:core-util"))
 
     // AndroidX Core
     implementation(libs.androidx.activity.compose)
