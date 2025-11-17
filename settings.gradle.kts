@@ -34,4 +34,5 @@ include(":features:home:home-domain")
 include(":features:home:home-ui")
 
 // Detail feature modules
+include(":features:detail:detail-data")
 include(":features:detail:detail-domain")

@@ -51,6 +51,7 @@ dependencies {
 
     // Feature modules - Data
     implementation(project(":features:home:home-data"))
+    implementation(project(":features:detail:detail-data"))
 
     // Core modules
     implementation(project(":core:core-database"))
