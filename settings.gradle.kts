@@ -32,3 +32,6 @@ include(":core:core-util")
 include(":features:home:home-data")
 include(":features:home:home-domain")
 include(":features:home:home-ui")
+
+// Detail feature modules
+include(":features:detail:detail-domain")
