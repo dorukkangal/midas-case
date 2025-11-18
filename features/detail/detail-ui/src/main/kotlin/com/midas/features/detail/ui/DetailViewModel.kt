@@ -34,16 +34,20 @@ class DetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
-    init {
-        loadCoinDetail()
-        checkFavoriteStatus()
-    }
-
     fun handleAction(action: DetailUiAction) {
         when (action) {
-            is DetailUiAction.RefreshDetail -> loadCoinDetail()
-            is DetailUiAction.ToggleFavorite -> toggleFavorite()
-            is DetailUiAction.DismissError -> dismissError()
+            is DetailUiAction.RefreshDetail -> {
+                loadCoinDetail()
+                checkFavoriteStatus()
+            }
+
+            is DetailUiAction.ToggleFavorite -> {
+                toggleFavorite()
+            }
+
+            is DetailUiAction.DismissError -> {
+                dismissError()
+            }
         }
     }
 

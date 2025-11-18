@@ -38,13 +38,19 @@ class HomeViewModel @Inject constructor(
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     init {
-        loadInitialData()
         observeSearchQuery()
     }
 
-    private fun loadInitialData() {
-        loadCoins()
-        loadTrendingCoins()
+    fun handleAction(action: HomeUiAction) {
+        when (action) {
+            is HomeUiAction.LoadCoins -> loadCoins()
+            is HomeUiAction.LoadTrendingCoins -> loadTrendingCoins()
+            is HomeUiAction.SearchCoins -> updateSearchQuery(action.query)
+            is HomeUiAction.RefreshData -> refreshAllData()
+            is HomeUiAction.RetryLoading -> retryLoading()
+            is HomeUiAction.ClearSearch -> clearSearch()
+            is HomeUiAction.DismissError -> dismissError()
+        }
     }
 
     private fun observeSearchQuery() {
@@ -68,18 +74,6 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun handleAction(action: HomeUiAction) {
-        when (action) {
-            is HomeUiAction.LoadCoins -> loadCoins()
-            is HomeUiAction.LoadTrendingCoins -> loadTrendingCoins()
-            is HomeUiAction.SearchCoins -> updateSearchQuery(action.query)
-            is HomeUiAction.RefreshData -> refreshAllData()
-            is HomeUiAction.RetryLoading -> retryLoading()
-            is HomeUiAction.ClearSearch -> clearSearch()
-            is HomeUiAction.DismissError -> dismissError()
-        }
-    }
-
     private fun loadCoins() {
         viewModelScope.launch {
             _uiState.update {
@@ -90,7 +84,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            getCoinsUseCase(GetCoinsUseCase.Params())
+            getCoinsUseCase()
                 .collect { result ->
                     result.fold(
                         onSuccess = { coins ->

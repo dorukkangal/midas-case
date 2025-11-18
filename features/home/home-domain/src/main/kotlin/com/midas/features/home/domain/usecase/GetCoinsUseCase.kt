@@ -23,7 +23,7 @@ class GetCoinsUseCase @Inject constructor(
      *
      * @return Flow of Result containing list of coins
      */
-    suspend operator fun invoke(params: Params): Flow<Result<List<Coin>>> {
+    suspend operator fun invoke(params: Params = Params()): Flow<Result<List<Coin>>> {
         return coinRepository.getCoins(
             vsCurrency = params.vsCurrency,
             order = params.sortOrder.name.lowercase(),

@@ -31,10 +31,6 @@ class FavoritesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FavoritesUiState())
     val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
 
-    init {
-        loadFavorites()
-    }
-
     fun handleAction(action: FavoritesUiAction) {
         when (action) {
             is FavoritesUiAction.LoadFavorites -> loadFavorites()

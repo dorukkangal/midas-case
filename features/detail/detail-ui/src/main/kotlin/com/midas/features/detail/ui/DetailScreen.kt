@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +52,10 @@ fun DetailScreen(
     onRetryClick: () -> Unit,
     onErrorDismiss: () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        onRefresh()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
