@@ -2,6 +2,9 @@ package com.midas.features.favorites.domain.usecase
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.midas.features.detail.domain.model.CoinDetail
+import com.midas.features.detail.domain.model.MarketData
+import com.midas.features.detail.domain.repository.CoinDetailRepository
 import com.midas.features.favorites.domain.repository.FavoritesRepository
 import com.midas.features.home.domain.model.Coin
 import com.midas.features.home.domain.model.SortOrder
@@ -16,22 +19,35 @@ class GetFavoriteCoinsUseCaseTest {
 
     private lateinit var favoritesRepository: FavoritesRepository
     private lateinit var getAllFavoritesUseCase: GetAllFavoritesUseCase
+    private lateinit var coinDetailRepository: CoinDetailRepository
 
     @Before
     fun setup() {
         favoritesRepository = mockk()
-        getAllFavoritesUseCase = GetAllFavoritesUseCase(favoritesRepository)
+        coinDetailRepository = mockk()
+        getAllFavoritesUseCase = GetAllFavoritesUseCase(favoritesRepository, coinDetailRepository)
     }
 
     @Test
     fun `invoke with ADDED_DATE_DESC should return coins in original order`() = runTest {
         // Given
         val coins = createTestCoins()
-        val params = GetAllFavoritesUseCase.Params(sortOrder = null) // Default order - added date desc
+        val params =
+            GetAllFavoritesUseCase.Params(sortOrder = null) // Default order - added date desc
 
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
 
         // When
         getAllFavoritesUseCase(params).test {
@@ -48,9 +64,8 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
@@ -58,9 +73,19 @@ class GetFavoriteCoinsUseCaseTest {
         runTest {
             // Given
             val coins = createTestCoins().reversed() // Reverse to test different ordering
-            coEvery {
-                favoritesRepository.getFavoriteCoins()
-            } returns Result.success(coins)
+            coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+            coins.forEach { coin ->
+                coEvery {
+                    coinDetailRepository.getCoinDetail(coin.id)
+                } returns Result.success(
+                    createCoinDetail(
+                        id = coin.id,
+                        price = coin.currentPrice,
+                        marketCap = coin.marketCap,
+                        pct24h = coin.priceChangePercentage24h
+                    )
+                )
+            }
             val params = GetAllFavoritesUseCase.Params(sortOrder = null) // No sorting applied
 
             // When
@@ -79,18 +104,27 @@ class GetFavoriteCoinsUseCaseTest {
                 awaitComplete()
             }
 
-            coVerify(exactly = 1) {
-                favoritesRepository.getFavoriteCoins()
-            }
+            coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+            coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
         }
 
     @Test
     fun `invoke with NAME_ASC should sort coins by name alphabetically`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_ASC)
 
         // When
@@ -108,18 +142,27 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with NAME_DESC should sort coins by name reverse alphabetically`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_DESC)
 
         // When
@@ -137,18 +180,27 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with PRICE_DESC should sort coins by price descending`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.PRICE_DESC)
 
         // When
@@ -166,18 +218,27 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with PRICE_ASC should sort coins by price ascending`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.PRICE_ASC)
 
         // When
@@ -195,18 +256,27 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with MARKET_CAP_DESC should sort coins by market cap descending`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.MARKET_CAP_DESC)
 
         // When
@@ -224,18 +294,27 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with MARKET_CAP_ASC should sort coins by market cap ascending`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.MARKET_CAP_ASC)
 
         // When
@@ -253,18 +332,27 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with CHANGE_24H_DESC should sort coins by 24h change descending`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.CHANGE_24H_DESC)
 
         // When
@@ -282,18 +370,27 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with CHANGE_24H_ASC should sort coins by 24h change ascending`() = runTest {
         // Given
         val coins = createTestCoins()
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.CHANGE_24H_ASC)
 
         // When
@@ -311,17 +408,14 @@ class GetFavoriteCoinsUseCaseTest {
             awaitComplete()
         }
 
-        coVerify(exactly = 1) {
-            favoritesRepository.getFavoriteCoins()
-        }
+        coVerify(exactly = 1) { favoritesRepository.getFavoriteCoins() }
+        coins.forEach { coin -> coVerify { coinDetailRepository.getCoinDetail(coin.id) } }
     }
 
     @Test
     fun `invoke with empty list should return empty list`() = runTest {
         // Given
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(emptyList())
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(emptyList())
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_ASC)
 
         // When
@@ -339,6 +433,9 @@ class GetFavoriteCoinsUseCaseTest {
         coVerify(exactly = 1) {
             favoritesRepository.getFavoriteCoins()
         }
+        coVerify(exactly = 0) {
+            coinDetailRepository.getCoinDetail(any())
+        }
     }
 
     @Test
@@ -349,9 +446,19 @@ class GetFavoriteCoinsUseCaseTest {
             createCoin(id = "coin2", marketCap = 1000L),
             createCoin(id = "coin3", marketCap = null)
         )
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.MARKET_CAP_DESC)
 
         // When
@@ -376,9 +483,19 @@ class GetFavoriteCoinsUseCaseTest {
             createCoin(id = "coin2", currentPrice = 100.0),
             createCoin(id = "coin3", currentPrice = null)
         )
-        coEvery {
-            favoritesRepository.getFavoriteCoins()
-        } returns Result.success(coins)
+        coEvery { favoritesRepository.getFavoriteCoins() } returns Result.success(coins)
+        coins.forEach { coin ->
+            coEvery {
+                coinDetailRepository.getCoinDetail(coin.id)
+            } returns Result.success(
+                createCoinDetail(
+                    id = coin.id,
+                    price = coin.currentPrice,
+                    marketCap = coin.marketCap,
+                    pct24h = coin.priceChangePercentage24h
+                )
+            )
+        }
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.PRICE_DESC)
 
         // When
@@ -483,4 +600,34 @@ class GetFavoriteCoinsUseCaseTest {
             priceChangePercentage24h = priceChangePercentage24h,
         )
     }
+
+    private fun createCoinDetail(
+        id: String,
+        price: Double?,
+        marketCap: Long?,
+        pct24h: Double?
+    ) = CoinDetail(
+        id = id,
+        name = "Mock Name $id",
+        symbol = "MCK",
+        description = null,
+        image = "https://example.com/$id.png",
+        marketCapRank = 1,
+        marketData = MarketData(
+            currentPrice = price,
+            marketCap = marketCap,
+            totalVolume = 1000L,
+            high24h = 0.0,
+            low24h = 0.0,
+            priceChangePercentage24h = pct24h,
+            priceChangePercentage7d = null,
+            priceChangePercentage30d = null,
+            circulatingSupply = null,
+            totalSupply = null,
+            maxSupply = null
+        ),
+        categories = emptyList(),
+        genesisDate = null
+    )
+
 }
