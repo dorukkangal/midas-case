@@ -35,7 +35,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -63,7 +63,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -91,7 +91,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -117,7 +117,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -145,7 +145,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -171,7 +171,7 @@ class SearchCoinsUseCaseTest {
         }
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -214,7 +214,7 @@ class SearchCoinsUseCaseTest {
         val exception = Exception("Network error")
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.failure(exception))
+        } returns Result.failure(exception)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -238,7 +238,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(cleanQuery)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -260,7 +260,7 @@ class SearchCoinsUseCaseTest {
         val query = "nonexistent"
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(emptyList()))
+        } returns Result.success(emptyList())
 
         // When
         val result = searchCoinsUseCase(query)
@@ -285,7 +285,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)
@@ -310,7 +310,7 @@ class SearchCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.searchCoins(query)
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = searchCoinsUseCase(query)

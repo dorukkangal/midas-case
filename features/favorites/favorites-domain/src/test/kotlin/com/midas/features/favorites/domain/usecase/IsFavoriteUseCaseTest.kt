@@ -6,7 +6,6 @@ import com.midas.features.favorites.domain.repository.FavoritesRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +29,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
 
         // When
         isFavoriteUseCase(params).test {
@@ -55,7 +54,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
 
         // When
         isFavoriteUseCase(params).test {
@@ -80,7 +79,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
 
         // When
         isFavoriteUseCase(params).test {
@@ -103,7 +102,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
 
         // When
         isFavoriteUseCase(params).test {
@@ -128,7 +127,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
 
         // When - First call
         isFavoriteUseCase(params).test {
@@ -158,11 +157,11 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId1)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
 
         coEvery {
             favoritesRepository.isFavorite(coinId2)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
 
         // When
         isFavoriteUseCase(params1).test {
@@ -189,7 +188,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         isFavoriteUseCase(params).test {
@@ -215,17 +214,17 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { throw exception }
+        } returns Result.failure(exception)
 
         // When
-        try {
-            isFavoriteUseCase(params).test {
-                awaitError()
-            }
-        } catch (e: Exception) {
+        isFavoriteUseCase(params).test {
             // Then
-            assertThat(e).isInstanceOf(RuntimeException::class.java)
-            assertThat(e.message).isEqualTo("Unexpected error")
+            val result = awaitItem()
+            assertThat(result.isFailure).isTrue()
+            assertThat(result.exceptionOrNull()).isInstanceOf(RuntimeException::class.java)
+            assertThat(result.exceptionOrNull()?.message).isEqualTo("Unexpected error")
+
+            awaitComplete()
         }
 
         coVerify(exactly = 1) {
@@ -242,7 +241,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         isFavoriteUseCase(params).test {
@@ -263,7 +262,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
 
         // When
         isFavoriteUseCase(params).test {
@@ -288,7 +287,7 @@ class IsFavoriteUseCaseTest {
 
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
 
         // When
         isFavoriteUseCase(params).test {
@@ -314,7 +313,7 @@ class IsFavoriteUseCaseTest {
         // First call returns true
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
 
         // When - First call
         isFavoriteUseCase(params).test {
@@ -325,7 +324,7 @@ class IsFavoriteUseCaseTest {
         // Change mock to return false
         coEvery {
             favoritesRepository.isFavorite(coinId)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
 
         // When - Second call
         isFavoriteUseCase(params).test {

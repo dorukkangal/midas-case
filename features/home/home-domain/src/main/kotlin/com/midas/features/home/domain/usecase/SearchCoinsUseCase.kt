@@ -3,9 +3,7 @@ package com.midas.features.home.domain.usecase
 import com.midas.features.home.domain.model.Coin
 import com.midas.features.home.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -20,30 +18,25 @@ class SearchCoinsUseCase @Inject constructor(
      * Execute the use case to search coins
      *
      * @param query Search query (minimum 2 characters)
-     *
      * @return Flow of Result containing filtered search results
      */
-    suspend operator fun invoke(query: String): Flow<Result<List<Coin>>> {
+    operator fun invoke(query: String): Flow<Result<List<Coin>>> = flow {
         // Validate search query
         if (query.length < MIN_SEARCH_LENGTH) {
-            return flowOf(
+            emit(
                 Result.failure(
                     IllegalArgumentException("Search query must be at least $MIN_SEARCH_LENGTH characters")
                 )
             )
+            return@flow
         }
 
         val cleanQuery = query.trim().lowercase()
 
-        return coinRepository.searchCoins(cleanQuery)
-            .map { result ->
-                result.map { coins ->
-                    filterSearchResults(coins, cleanQuery)
-                }
-            }
-            .catch { throwable ->
-                emit(Result.failure(throwable))
-            }
+        emit(
+            coinRepository.searchCoins(cleanQuery)
+                .map { coins -> filterSearchResults(coins, cleanQuery) }
+        )
     }
 
     /**

@@ -6,7 +6,6 @@ import com.midas.features.home.domain.repository.CoinRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -35,7 +34,7 @@ class GetTrendingCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -68,7 +67,7 @@ class GetTrendingCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -95,7 +94,7 @@ class GetTrendingCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -127,7 +126,7 @@ class GetTrendingCoinsUseCaseTest {
         }
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -152,7 +151,7 @@ class GetTrendingCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -177,7 +176,7 @@ class GetTrendingCoinsUseCaseTest {
         val exception = Exception("Network error")
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.failure(exception))
+        } returns Result.failure(exception)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -201,7 +200,7 @@ class GetTrendingCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -227,7 +226,7 @@ class GetTrendingCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getTrendingCoinsUseCase()
@@ -247,7 +246,7 @@ class GetTrendingCoinsUseCaseTest {
         // Given
         coEvery {
             coinRepository.getTrendingCoins()
-        } returns flowOf(Result.success(emptyList()))
+        } returns Result.success(emptyList())
 
         // When
         val result = getTrendingCoinsUseCase()

@@ -1,6 +1,5 @@
 package com.midas.features.favorites.data.repository
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.midas.features.favorites.data.local.dao.FavoriteCoinDao
 import com.midas.features.favorites.data.local.model.FavoriteCoinEntity
@@ -35,18 +34,14 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.getAllFavoriteCoins() } returns entities
 
         // When
-        repository.getFavoriteCoins().test {
-            val result = awaitItem()
+        val result = repository.getFavoriteCoins()
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            val coins = result.getOrNull()
-            assertThat(coins).hasSize(2)
-            assertThat(coins?.get(0)?.id).isEqualTo("bitcoin")
-            assertThat(coins?.get(1)?.id).isEqualTo("ethereum")
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        val coins = result.getOrNull()
+        assertThat(coins).hasSize(2)
+        assertThat(coins?.get(0)?.id).isEqualTo("bitcoin")
+        assertThat(coins?.get(1)?.id).isEqualTo("ethereum")
     }
 
     @Test
@@ -55,15 +50,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.getAllFavoriteCoins() } returns emptyList()
 
         // When
-        repository.getFavoriteCoins().test {
-            val result = awaitItem()
+        val result = repository.getFavoriteCoins()
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isEmpty()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEmpty()
     }
 
     @Test
@@ -73,15 +64,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.getAllFavoriteCoins() } throws exception
 
         // When
-        repository.getFavoriteCoins().test {
-            val result = awaitItem()
+        val result = repository.getFavoriteCoins()
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     @Test
@@ -90,10 +77,7 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.getAllFavoriteCoins() } returns emptyList()
 
         // When
-        repository.getFavoriteCoins().test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.getFavoriteCoins()
 
         // Then
         coVerify(exactly = 1) {
@@ -109,15 +93,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.getFavoriteCoinsCount() } returns 5
 
         // When
-        repository.getFavoriteCoinsCount().test {
-            val result = awaitItem()
+        val result = repository.getFavoriteCoinsCount()
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isEqualTo(5)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEqualTo(5)
     }
 
     @Test
@@ -126,15 +106,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.getFavoriteCoinsCount() } returns 0
 
         // When
-        repository.getFavoriteCoinsCount().test {
-            val result = awaitItem()
+        val result = repository.getFavoriteCoinsCount()
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isEqualTo(0)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEqualTo(0)
     }
 
     @Test
@@ -144,15 +120,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.getFavoriteCoinsCount() } throws exception
 
         // When
-        repository.getFavoriteCoinsCount().test {
-            val result = awaitItem()
+        val result = repository.getFavoriteCoinsCount()
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     // ==================== isFavorite Tests ====================
@@ -163,15 +135,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.isFavorite("bitcoin") } returns true
 
         // When
-        repository.isFavorite("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.isFavorite("bitcoin")
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isTrue()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isTrue()
     }
 
     @Test
@@ -180,15 +148,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.isFavorite("bitcoin") } returns false
 
         // When
-        repository.isFavorite("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.isFavorite("bitcoin")
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isFalse()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isFalse()
     }
 
     @Test
@@ -197,10 +161,7 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.isFavorite(any()) } returns false
 
         // When
-        repository.isFavorite("ethereum").test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.isFavorite("ethereum")
 
         // Then
         coVerify(exactly = 1) {
@@ -215,15 +176,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.isFavorite(any()) } throws exception
 
         // When
-        repository.isFavorite("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.isFavorite("bitcoin")
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     // ==================== addToFavorites Tests ====================
@@ -235,14 +192,10 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.insertFavoriteCoin(any()) } returns Unit
 
         // When
-        repository.addToFavorites(coin).test {
-            val result = awaitItem()
+        val result = repository.addToFavorites(coin)
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
     }
 
     @Test
@@ -252,10 +205,7 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.insertFavoriteCoin(any()) } returns Unit
 
         // When
-        repository.addToFavorites(coin).test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.addToFavorites(coin)
 
         // Then
         coVerify(exactly = 1) {
@@ -273,15 +223,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.insertFavoriteCoin(any()) } throws exception
 
         // When
-        repository.addToFavorites(coin).test {
-            val result = awaitItem()
+        val result = repository.addToFavorites(coin)
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     // ==================== removeFromFavorites Tests ====================
@@ -292,14 +238,10 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.deleteFavoriteCoinById(any()) } returns Unit
 
         // When
-        repository.removeFromFavorites("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.removeFromFavorites("bitcoin")
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
     }
 
     @Test
@@ -308,10 +250,7 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.deleteFavoriteCoinById(any()) } returns Unit
 
         // When
-        repository.removeFromFavorites("ethereum").test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.removeFromFavorites("ethereum")
 
         // Then
         coVerify(exactly = 1) {
@@ -326,15 +265,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.deleteFavoriteCoinById(any()) } throws exception
 
         // When
-        repository.removeFromFavorites("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.removeFromFavorites("bitcoin")
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     // ==================== clearAllFavorites Tests ====================
@@ -345,14 +280,10 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.deleteAllFavoriteCoins() } returns Unit
 
         // When
-        repository.clearAllFavorites().test {
-            val result = awaitItem()
+        val result = repository.clearAllFavorites()
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
     }
 
     @Test
@@ -361,10 +292,7 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.deleteAllFavoriteCoins() } returns Unit
 
         // When
-        repository.clearAllFavorites().test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.clearAllFavorites()
 
         // Then
         coVerify(exactly = 1) {
@@ -379,15 +307,11 @@ class FavoritesRepositoryImplTest {
         coEvery { favoriteCoinDao.deleteAllFavoriteCoins() } throws exception
 
         // When
-        repository.clearAllFavorites().test {
-            val result = awaitItem()
+        val result = repository.clearAllFavorites()
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     // ==================== Helper Methods ====================

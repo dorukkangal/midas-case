@@ -6,7 +6,6 @@ import com.midas.features.favorites.domain.repository.FavoritesRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +26,7 @@ class ClearAllFavoritesUseCaseTest {
         // Given
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -49,7 +48,7 @@ class ClearAllFavoritesUseCaseTest {
         // Given
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -68,7 +67,7 @@ class ClearAllFavoritesUseCaseTest {
         // Given
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When - First call
         clearAllFavoritesUseCase().test {
@@ -100,7 +99,7 @@ class ClearAllFavoritesUseCaseTest {
         val exception = Exception("Failed to clear favorites")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -123,7 +122,7 @@ class ClearAllFavoritesUseCaseTest {
         val exception = Exception("Database error occurred")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -142,17 +141,17 @@ class ClearAllFavoritesUseCaseTest {
         val exception = RuntimeException("Unexpected error")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { throw exception }
+        } returns Result.failure(exception)
 
         // When
-        try {
-            clearAllFavoritesUseCase().test {
-                awaitError()
-            }
-        } catch (e: Exception) {
+        clearAllFavoritesUseCase().test {
             // Then
-            assertThat(e).isInstanceOf(RuntimeException::class.java)
-            assertThat(e.message).isEqualTo("Unexpected error")
+            val result = awaitItem()
+            assertThat(result.isFailure).isTrue()
+            assertThat(result.exceptionOrNull()).isInstanceOf(RuntimeException::class.java)
+            assertThat(result.exceptionOrNull()?.message).isEqualTo("Unexpected error")
+
+            awaitComplete()
         }
 
         coVerify(exactly = 1) {
@@ -166,7 +165,7 @@ class ClearAllFavoritesUseCaseTest {
         val exception = Exception("SQL constraint violation")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -184,7 +183,7 @@ class ClearAllFavoritesUseCaseTest {
         // Given - Repository returns success even if table is already empty
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -201,7 +200,7 @@ class ClearAllFavoritesUseCaseTest {
         // Given
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -221,7 +220,7 @@ class ClearAllFavoritesUseCaseTest {
         val exception = Exception("Clear operation failed")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -241,7 +240,7 @@ class ClearAllFavoritesUseCaseTest {
         val exception = Exception("Operation timeout")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -260,7 +259,7 @@ class ClearAllFavoritesUseCaseTest {
         val exception = SecurityException("Permission denied")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -279,7 +278,7 @@ class ClearAllFavoritesUseCaseTest {
         val exception = Exception("Operation failed")
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -299,7 +298,7 @@ class ClearAllFavoritesUseCaseTest {
         // Given
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         clearAllFavoritesUseCase().test {
@@ -314,7 +313,7 @@ class ClearAllFavoritesUseCaseTest {
         // Given
         coEvery {
             favoritesRepository.clearAllFavorites()
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When - Multiple concurrent calls (simulated sequentially in test)
         val results = mutableListOf<Result<Unit>>()

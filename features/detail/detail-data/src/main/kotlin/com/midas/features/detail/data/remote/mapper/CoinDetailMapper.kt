@@ -5,6 +5,7 @@ import com.midas.features.detail.data.remote.model.DescriptionResponse
 import com.midas.features.detail.data.remote.model.MarketDataResponse
 import com.midas.features.detail.domain.model.CoinDetail
 import com.midas.features.detail.domain.model.MarketData
+import org.jsoup.Jsoup
 import java.util.Currency
 
 fun CoinDetailResponse.toCoinDetail() = CoinDetail(
@@ -19,11 +20,9 @@ fun CoinDetailResponse.toCoinDetail() = CoinDetail(
     genesisDate = genesisDate,
 )
 
-fun DescriptionResponse.toDescription() = en
-    .replace(Regex("<[^>]*>"), "")
-    .replace(Regex("\\s+"), " ")
-    .trim()
-    .takeIf { it.isNotBlank() }
+fun DescriptionResponse.toDescription() =
+    Jsoup.parse(en).text()
+        .takeIf { it.isNotBlank() }
 
 fun MarketDataResponse.toMarketData(
     currency: Currency = Currency.getInstance("USD")

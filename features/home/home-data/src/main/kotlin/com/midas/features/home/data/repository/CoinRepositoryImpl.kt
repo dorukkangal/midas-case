@@ -4,8 +4,6 @@ import com.midas.features.home.data.remote.api.CoinApiService
 import com.midas.features.home.data.remote.mapper.toCoin
 import com.midas.features.home.domain.model.Coin
 import com.midas.features.home.domain.repository.CoinRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,39 +17,19 @@ class CoinRepositoryImpl @Inject constructor(
         order: String,
         perPage: Int,
         page: Int,
-    ): Flow<Result<List<Coin>>> = flow {
-        val remoteResult = apiService.getCoins(vsCurrency, order, perPage, page)
-        remoteResult.fold(
-            onSuccess = { coins ->
-                emit(Result.success(coins.map { it.toCoin() }))
-            },
-            onFailure = { error ->
-                emit(Result.failure(error))
-            }
-        )
-    }
+    ): Result<List<Coin>> =
+        apiService.getCoins(
+            vsCurrency = vsCurrency,
+            order = order,
+            perPage = perPage,
+            page = page
+        ).map { coins -> coins.map { it.toCoin() } }
 
-    override suspend fun searchCoins(query: String): Flow<Result<List<Coin>>> = flow {
-        val remoteResult = apiService.searchCoins(query)
-        remoteResult.fold(
-            onSuccess = { response ->
-                emit(Result.success(response.coins.map { it.toCoin() }))
-            },
-            onFailure = { error ->
-                emit(Result.failure(error))
-            }
-        )
-    }
+    override suspend fun searchCoins(query: String): Result<List<Coin>> =
+        apiService.searchCoins(query)
+            .map { response -> response.coins.map { it.toCoin() } }
 
-    override suspend fun getTrendingCoins(): Flow<Result<List<Coin>>> = flow {
-        val remoteResult = apiService.getTrendingCoins()
-        remoteResult.fold(
-            onSuccess = { trendingCoins ->
-                emit(Result.success(trendingCoins.coins.map { it.item.toCoin() }))
-            },
-            onFailure = { error ->
-                emit(Result.failure(error))
-            }
-        )
-    }
+    override suspend fun getTrendingCoins(): Result<List<Coin>> =
+        apiService.getTrendingCoins()
+            .map { response -> response.coins.map { it.item.toCoin() } }
 }

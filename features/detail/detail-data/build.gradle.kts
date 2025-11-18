@@ -49,6 +49,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     implementation(libs.bundles.ktor)
+    implementation(libs.jsoup)
 
     // Unit testing
     testImplementation(libs.junit)

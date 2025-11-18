@@ -2,12 +2,9 @@ package com.midas.features.favorites.domain.usecase
 
 import com.midas.features.favorites.domain.repository.FavoritesRepository
 import com.midas.features.home.domain.model.Coin
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -21,42 +18,29 @@ class ToggleFavoriteUseCase @Inject constructor(
     /**
      * Execute the use case to toggle favorite status
      *
-     * @param params Parameters for fetching the coin to toggle favorite status
+     * @param params Parameters for the coin to toggle favorite status
      *
-     * @return Flow of Result indicating success or failure with message
+     * @return Flow of Result with action performed (ADDED or REMOVED)
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend operator fun invoke(params: Params): Flow<Result<FavoriteAction>> {
-        return favoritesRepository.isFavorite(params.coin.id)
-            .flatMapConcat { isFavResult ->
-                isFavResult.fold(
-                    onSuccess = { isFavorite ->
-                        if (isFavorite) {
-                            favoritesRepository.removeFromFavorites(params.coin.id)
-                                .map { removeResult ->
-                                    removeResult.fold(
-                                        onSuccess = { Result.success(FavoriteAction.REMOVED) },
-                                        onFailure = { Result.failure(it) }
-                                    )
-                                }
-                        } else {
-                            favoritesRepository.addToFavorites(params.coin)
-                                .map { addResult ->
-                                    addResult.fold(
-                                        onSuccess = { Result.success(FavoriteAction.ADDED) },
-                                        onFailure = { Result.failure(it) }
-                                    )
-                                }
-                        }
-                    },
-                    onFailure = { error ->
-                        flowOf(Result.failure(error))
+    operator fun invoke(params: Params): Flow<Result<FavoriteAction>> = flow {
+        val result = favoritesRepository.isFavorite(params.coin.id)
+            .fold(
+                onSuccess = { isFavorite ->
+                    if (isFavorite) {
+                        favoritesRepository.removeFromFavorites(params.coin.id)
+                            .map { FavoriteAction.REMOVED }
+                    } else {
+                        favoritesRepository.addToFavorites(params.coin)
+                            .map { FavoriteAction.ADDED }
                     }
-                )
-            }
-            .catch {
-                emit(Result.failure(it))
-            }
+                },
+                onFailure = { throwable ->
+                    Result.failure(throwable)
+                }
+            )
+        emit(result)
+    }.catch { e ->
+        emit(Result.failure(e))
     }
 
     enum class FavoriteAction {

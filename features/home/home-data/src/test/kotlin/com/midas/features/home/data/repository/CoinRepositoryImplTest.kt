@@ -1,6 +1,5 @@
 package com.midas.features.home.data.repository
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.midas.features.home.data.remote.api.CoinApiService
 import com.midas.features.home.data.remote.model.CoinResponse
@@ -41,20 +40,16 @@ class CoinRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoins("usd", "market_cap_desc", 10, 1).test {
-            val result = awaitItem()
+        val result = repository.getCoins("usd", "market_cap_desc", 10, 1)
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            val coins = result.getOrNull()
-            assertThat(coins).hasSize(2)
-            assertThat(coins?.get(0)?.id).isEqualTo("bitcoin")
-            assertThat(coins?.get(0)?.name).isEqualTo("Bitcoin")
-            assertThat(coins?.get(1)?.id).isEqualTo("ethereum")
-            assertThat(coins?.get(1)?.name).isEqualTo("Ethereum")
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        val coins = result.getOrNull()
+        assertThat(coins).hasSize(2)
+        assertThat(coins?.get(0)?.id).isEqualTo("bitcoin")
+        assertThat(coins?.get(0)?.name).isEqualTo("Bitcoin")
+        assertThat(coins?.get(1)?.id).isEqualTo("ethereum")
+        assertThat(coins?.get(1)?.name).isEqualTo("Ethereum")
     }
 
     @Test
@@ -66,10 +61,7 @@ class CoinRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoins("eur", "market_cap_asc", 50, 2).test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.getCoins("eur", "market_cap_asc", 50, 2)
 
         // Then
         coVerify(exactly = 1) {
@@ -86,15 +78,11 @@ class CoinRepositoryImplTest {
         } returns Result.failure(exception)
 
         // When
-        repository.getCoins("usd", "market_cap_desc", 10, 1).test {
-            val result = awaitItem()
+        val result = repository.getCoins("usd", "market_cap_desc", 10, 1)
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     @Test
@@ -105,15 +93,11 @@ class CoinRepositoryImplTest {
         } returns Result.success(emptyList())
 
         // When
-        repository.getCoins("usd", "market_cap_desc", 10, 1).test {
-            val result = awaitItem()
+        val result = repository.getCoins("usd", "market_cap_desc", 10, 1)
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isEmpty()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEmpty()
     }
 
     // ==================== searchCoins Tests ====================
@@ -127,18 +111,14 @@ class CoinRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.searchCoins("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.searchCoins("bitcoin")
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            val coins = result.getOrNull()
-            assertThat(coins).hasSize(2)
-            assertThat(coins?.get(0)?.name).isEqualTo("Bitcoin")
-            assertThat(coins?.get(1)?.name).isEqualTo("Ethereum")
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        val coins = result.getOrNull()
+        assertThat(coins).hasSize(2)
+        assertThat(coins?.get(0)?.name).isEqualTo("Bitcoin")
+        assertThat(coins?.get(1)?.name).isEqualTo("Ethereum")
     }
 
     @Test
@@ -150,10 +130,7 @@ class CoinRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.searchCoins("ethereum").test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.searchCoins("ethereum")
 
         // Then
         coVerify(exactly = 1) {
@@ -170,15 +147,11 @@ class CoinRepositoryImplTest {
         } returns Result.failure(exception)
 
         // When
-        repository.searchCoins("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.searchCoins("bitcoin")
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     @Test
@@ -189,15 +162,11 @@ class CoinRepositoryImplTest {
         } returns Result.success(SearchResponse(emptyList()))
 
         // When
-        repository.searchCoins("nonexistent").test {
-            val result = awaitItem()
+        val result = repository.searchCoins("nonexistent")
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isEmpty()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEmpty()
     }
 
     // ==================== getTrendingCoins Tests ====================
@@ -211,20 +180,16 @@ class CoinRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getTrendingCoins().test {
-            val result = awaitItem()
+        val result = repository.getTrendingCoins()
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            val coins = result.getOrNull()
-            assertThat(coins).hasSize(2)
-            assertThat(coins?.get(0)?.id).isEqualTo("bitcoin")
-            assertThat(coins?.get(0)?.name).isEqualTo("Bitcoin")
-            assertThat(coins?.get(1)?.id).isEqualTo("ethereum")
-            assertThat(coins?.get(1)?.name).isEqualTo("Ethereum")
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        val coins = result.getOrNull()
+        assertThat(coins).hasSize(2)
+        assertThat(coins?.get(0)?.id).isEqualTo("bitcoin")
+        assertThat(coins?.get(0)?.name).isEqualTo("Bitcoin")
+        assertThat(coins?.get(1)?.id).isEqualTo("ethereum")
+        assertThat(coins?.get(1)?.name).isEqualTo("Ethereum")
     }
 
     @Test
@@ -236,10 +201,7 @@ class CoinRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getTrendingCoins().test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.getTrendingCoins()
 
         // Then
         coVerify(exactly = 1) {
@@ -256,15 +218,11 @@ class CoinRepositoryImplTest {
         } returns Result.failure(exception)
 
         // When
-        repository.getTrendingCoins().test {
-            val result = awaitItem()
+        val result = repository.getTrendingCoins()
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     @Test
@@ -276,15 +234,11 @@ class CoinRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getTrendingCoins().test {
-            val result = awaitItem()
+        val result = repository.getTrendingCoins()
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            assertThat(result.getOrNull()).isEmpty()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.getOrNull()).isEmpty()
     }
 
     // ==================== Helper Methods ====================

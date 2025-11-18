@@ -1,7 +1,6 @@
 package com.midas.features.home.domain.repository
 
 import com.midas.features.home.domain.model.Coin
-import kotlinx.coroutines.flow.Flow
 
 interface CoinRepository {
 
@@ -18,17 +17,17 @@ interface CoinRepository {
         order: String,
         perPage: Int,
         page: Int,
-    ): Flow<Result<List<Coin>>>
+    ): Result<List<Coin>>
 
     /**
      * Search coins by name or symbol
      *
      * @param query Search query
      */
-    suspend fun searchCoins(query: String): Flow<Result<List<Coin>>>
+    suspend fun searchCoins(query: String): Result<List<Coin>>
 
     /**
      * Get trending coins
      */
-    suspend fun getTrendingCoins(): Flow<Result<List<Coin>>>
+    suspend fun getTrendingCoins(): Result<List<Coin>>
 }

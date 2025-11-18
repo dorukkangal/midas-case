@@ -2,6 +2,7 @@ package com.midas.features.favorites.domain.usecase
 
 import com.midas.features.favorites.domain.repository.FavoritesRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -17,7 +18,7 @@ class ClearAllFavoritesUseCase @Inject constructor(
      *
      * @return Flow of sorted favorite coins
      */
-    suspend operator fun invoke(): Flow<Result<Unit>> {
-        return favoritesRepository.clearAllFavorites()
+    operator fun invoke(): Flow<Result<Unit>> = flow {
+        emit(favoritesRepository.clearAllFavorites())
     }
 }

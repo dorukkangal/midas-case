@@ -7,7 +7,6 @@ import com.midas.features.home.domain.model.Coin
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -29,10 +28,10 @@ class ToggleFavoriteUseCaseTest {
         val coin = createTestCoin()
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
         coEvery {
             favoritesRepository.addToFavorites(coin)
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -55,10 +54,10 @@ class ToggleFavoriteUseCaseTest {
         val coin = createTestCoin()
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
         coEvery {
             favoritesRepository.removeFromFavorites(coin.id)
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -82,7 +81,7 @@ class ToggleFavoriteUseCaseTest {
         val exception = RuntimeException("Database error")
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -106,7 +105,7 @@ class ToggleFavoriteUseCaseTest {
         val exception = RuntimeException("Unexpected error")
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { throw exception }
+        } returns Result.failure(exception)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -128,10 +127,10 @@ class ToggleFavoriteUseCaseTest {
         val exception = Exception("Add failed")
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
         coEvery {
             favoritesRepository.addToFavorites(coin)
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -154,10 +153,10 @@ class ToggleFavoriteUseCaseTest {
         val exception = Exception("Add exception")
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
         coEvery {
             favoritesRepository.addToFavorites(coin)
-        } returns flow { throw exception }
+        } returns Result.failure(exception)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -179,10 +178,10 @@ class ToggleFavoriteUseCaseTest {
         val exception = Exception("Remove failed")
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
         coEvery {
             favoritesRepository.removeFromFavorites(coin.id)
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -205,10 +204,10 @@ class ToggleFavoriteUseCaseTest {
         val exception = Exception("Remove exception")
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
         coEvery {
             favoritesRepository.removeFromFavorites(coin.id)
-        } returns flow { throw exception }
+        } returns Result.failure(exception)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -231,10 +230,10 @@ class ToggleFavoriteUseCaseTest {
         // First toggle: Add
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(false)) }
+        } returns Result.success(false)
         coEvery {
             favoritesRepository.addToFavorites(coin)
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {
@@ -248,10 +247,10 @@ class ToggleFavoriteUseCaseTest {
         // Second toggle: Remove
         coEvery {
             favoritesRepository.isFavorite(coin.id)
-        } returns flow { emit(Result.success(true)) }
+        } returns Result.success(true)
         coEvery {
             favoritesRepository.removeFromFavorites(coin.id)
-        } returns flow { emit(Result.success(Unit)) }
+        } returns Result.success(Unit)
 
         // When
         toggleFavoriteUseCase(ToggleFavoriteUseCase.Params(coin)).test {

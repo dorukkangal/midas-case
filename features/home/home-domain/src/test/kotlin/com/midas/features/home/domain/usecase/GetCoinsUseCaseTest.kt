@@ -40,7 +40,7 @@ class GetCoinsUseCaseTest {
                 perPage = 50,
                 page = 1
             )
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(GetCoinsUseCase.Params())
@@ -75,7 +75,7 @@ class GetCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getCoins(any(), any(), any(), any())
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(GetCoinsUseCase.Params())
@@ -107,7 +107,7 @@ class GetCoinsUseCaseTest {
                 perPage = 50,
                 page = 1
             )
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(
@@ -136,7 +136,7 @@ class GetCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getCoins(any(), any(), any(), any())
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(
@@ -165,7 +165,7 @@ class GetCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getCoins(any(), any(), any(), any())
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(
@@ -194,7 +194,7 @@ class GetCoinsUseCaseTest {
         )
         coEvery {
             coinRepository.getCoins(any(), any(), any(), any())
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(
@@ -219,7 +219,7 @@ class GetCoinsUseCaseTest {
         val exception = Exception("Network error")
         coEvery {
             coinRepository.getCoins(any(), any(), any(), any())
-        } returns flowOf(Result.failure(exception))
+        } returns Result.failure(exception)
 
         // When
         val result = getCoinsUseCase(GetCoinsUseCase.Params())
@@ -246,7 +246,7 @@ class GetCoinsUseCaseTest {
                 perPage = 10,
                 page = 1
             )
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(GetCoinsUseCase.Params(perPage = 10))
@@ -283,7 +283,7 @@ class GetCoinsUseCaseTest {
                 perPage = 50,
                 page = 1
             )
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(
@@ -320,7 +320,7 @@ class GetCoinsUseCaseTest {
                 perPage = 50,
                 page = 2
             )
-        } returns flowOf(Result.success(mockCoins))
+        } returns Result.success(mockCoins)
 
         // When
         val result = getCoinsUseCase(

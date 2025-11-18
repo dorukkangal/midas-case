@@ -40,6 +40,7 @@ coroutinesVersion = "1.10.2"
 
 # Serialization
 serializationVersion = "1.9.0"
+jsoupVersion = "1.21.2"
 
 # Coil for image loading
 coilVersion = "2.7.0"
@@ -99,9 +100,9 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
 
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutinesVersion" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationVersion" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoupVersion" }
 
 # Image loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilVersion" }

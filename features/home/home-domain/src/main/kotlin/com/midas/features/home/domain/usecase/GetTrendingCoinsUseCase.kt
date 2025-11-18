@@ -4,7 +4,7 @@ import com.midas.features.home.domain.model.Coin
 import com.midas.features.home.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -25,16 +25,13 @@ class GetTrendingCoinsUseCase @Inject constructor(
      *
      * @return Flow of Result containing trending coins
      */
-    suspend operator fun invoke(): Flow<Result<List<Coin>>> {
-        return coinRepository.getTrendingCoins()
-            .map { result ->
-                result.map { coins ->
-                    filterTrendingCoins(coins)
-                }
-            }
-            .catch { throwable ->
-                emit(Result.failure(throwable))
-            }
+    operator fun invoke(): Flow<Result<List<Coin>>> = flow {
+        emit(
+            coinRepository.getTrendingCoins()
+                .map { coins -> filterTrendingCoins(coins) }
+        )
+    }.catch { e ->
+        emit(Result.failure(e))
     }
 
     /**

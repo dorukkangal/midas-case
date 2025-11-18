@@ -8,7 +8,6 @@ import com.midas.features.home.domain.model.SortOrder
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +31,7 @@ class GetFavoriteCoinsUseCaseTest {
 
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
 
         // When
         getAllFavoritesUseCase(params).test {
@@ -61,7 +60,7 @@ class GetFavoriteCoinsUseCaseTest {
             val coins = createTestCoins().reversed() // Reverse to test different ordering
             coEvery {
                 favoritesRepository.getFavoriteCoins()
-            } returns flow { emit(Result.success(coins)) }
+            } returns Result.success(coins)
             val params = GetAllFavoritesUseCase.Params(sortOrder = null) // No sorting applied
 
             // When
@@ -91,7 +90,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_ASC)
 
         // When
@@ -120,7 +119,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_DESC)
 
         // When
@@ -149,7 +148,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.PRICE_DESC)
 
         // When
@@ -178,7 +177,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.PRICE_ASC)
 
         // When
@@ -207,7 +206,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.MARKET_CAP_DESC)
 
         // When
@@ -236,7 +235,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.MARKET_CAP_ASC)
 
         // When
@@ -265,7 +264,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.CHANGE_24H_DESC)
 
         // When
@@ -294,7 +293,7 @@ class GetFavoriteCoinsUseCaseTest {
         val coins = createTestCoins()
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.CHANGE_24H_ASC)
 
         // When
@@ -322,7 +321,7 @@ class GetFavoriteCoinsUseCaseTest {
         // Given
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(emptyList())) }
+        } returns Result.success(emptyList())
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_ASC)
 
         // When
@@ -352,7 +351,7 @@ class GetFavoriteCoinsUseCaseTest {
         )
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.MARKET_CAP_DESC)
 
         // When
@@ -379,7 +378,7 @@ class GetFavoriteCoinsUseCaseTest {
         )
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.success(coins)) }
+        } returns Result.success(coins)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.PRICE_DESC)
 
         // When
@@ -402,7 +401,7 @@ class GetFavoriteCoinsUseCaseTest {
         val exception = Exception("Database error")
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_ASC)
 
         // When
@@ -422,7 +421,7 @@ class GetFavoriteCoinsUseCaseTest {
         val exception = RuntimeException("Unexpected error")
         coEvery {
             favoritesRepository.getFavoriteCoins()
-        } returns flow { throw exception }
+        } returns Result.failure(exception)
         val params = GetAllFavoritesUseCase.Params(sortOrder = SortOrder.NAME_ASC)
 
         // When

@@ -1,6 +1,5 @@
 package com.midas.features.detail.data.repository
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.midas.features.detail.data.remote.api.CoinDetailApiService
 import com.midas.features.detail.data.remote.model.CoinDetailResponse
@@ -34,21 +33,17 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            assertThat(result.isSuccess).isTrue()
-            val coinDetail = result.getOrNull()
-            assertThat(coinDetail).isNotNull()
-            assertThat(coinDetail?.id).isEqualTo("bitcoin")
-            assertThat(coinDetail?.name).isEqualTo("Bitcoin")
-            assertThat(coinDetail?.symbol).isEqualTo("BTC")
-            assertThat(coinDetail?.description).isEqualTo("Bitcoin is a cryptocurrency")
-            assertThat(coinDetail?.image).isEqualTo("https://example.com/large.png")
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isSuccess).isTrue()
+        val coinDetail = result.getOrNull()
+        assertThat(coinDetail).isNotNull()
+        assertThat(coinDetail?.id).isEqualTo("bitcoin")
+        assertThat(coinDetail?.name).isEqualTo("Bitcoin")
+        assertThat(coinDetail?.symbol).isEqualTo("BTC")
+        assertThat(coinDetail?.description).isEqualTo("Bitcoin is a cryptocurrency")
+        assertThat(coinDetail?.image).isEqualTo("https://example.com/large.png")
     }
 
     @Test
@@ -60,10 +55,7 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("ethereum").test {
-            awaitItem()
-            awaitComplete()
-        }
+        repository.getCoinDetail("ethereum")
 
         // Then
         coVerify(exactly = 1) {
@@ -80,15 +72,11 @@ class CoinDetailRepositoryImplTest {
         } returns Result.failure(exception)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isEqualTo(exception)
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isEqualTo(exception)
     }
 
     @Test
@@ -100,18 +88,14 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            val marketData = result.getOrNull()?.marketData
-            assertThat(marketData).isNotNull()
-            assertThat(marketData?.currentPrice).isEqualTo(50000.0)
-            assertThat(marketData?.marketCap).isEqualTo(1000000000000L)
-            assertThat(marketData?.totalVolume).isEqualTo(50000000000L)
-
-            awaitComplete()
-        }
+        // Then
+        val marketData = result.getOrNull()?.marketData
+        assertThat(marketData).isNotNull()
+        assertThat(marketData?.currentPrice).isEqualTo(50000.0)
+        assertThat(marketData?.marketCap).isEqualTo(1000000000000L)
+        assertThat(marketData?.totalVolume).isEqualTo(50000000000L)
     }
 
     @Test
@@ -125,17 +109,13 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            val description = result.getOrNull()?.description
-            assertThat(description).isEqualTo("Bitcoin is a cryptocurrency")
-            assertThat(description).doesNotContain("<")
-            assertThat(description).doesNotContain(">")
-
-            awaitComplete()
-        }
+        // Then
+        val description = result.getOrNull()?.description
+        assertThat(description).isEqualTo("Bitcoin is a cryptocurrency")
+        assertThat(description).doesNotContain("<")
+        assertThat(description).doesNotContain(">")
     }
 
     @Test
@@ -147,14 +127,10 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            assertThat(result.getOrNull()?.marketCapRank).isNull()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.getOrNull()?.marketCapRank).isNull()
     }
 
     @Test
@@ -166,14 +142,10 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            assertThat(result.getOrNull()?.genesisDate).isNull()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.getOrNull()?.genesisDate).isNull()
     }
 
     @Test
@@ -185,14 +157,10 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            assertThat(result.getOrNull()?.categories).isEmpty()
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.getOrNull()?.categories).isEmpty()
     }
 
     @Test
@@ -204,14 +172,10 @@ class CoinDetailRepositoryImplTest {
         } returns Result.success(mockResponse)
 
         // When
-        repository.getCoinDetail("bitcoin").test {
-            val result = awaitItem()
+        val result = repository.getCoinDetail("bitcoin")
 
-            // Then
-            assertThat(result.getOrNull()?.image).isEqualTo("https://example.com/large.png")
-
-            awaitComplete()
-        }
+        // Then
+        assertThat(result.getOrNull()?.image).isEqualTo("https://example.com/large.png")
     }
 
     // ==================== Helper Methods ====================

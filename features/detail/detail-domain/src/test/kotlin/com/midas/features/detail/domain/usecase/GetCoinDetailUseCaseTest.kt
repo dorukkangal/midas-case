@@ -8,7 +8,7 @@ import com.midas.features.detail.domain.repository.CoinDetailRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +33,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -64,7 +64,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -103,7 +103,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -129,7 +129,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -151,7 +151,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -174,7 +174,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -196,7 +196,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -218,7 +218,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.failure(exception)) }
+        } returns Result.failure(exception)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -244,18 +244,15 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { throw exception }
+        } returns Result.failure(exception)
 
         // When
-        try {
-            getCoinDetailUseCase(params).test {
-                // Expecting exception to be thrown during flow collection
-                awaitError()
-            }
-        } catch (e: Exception) {
-            // Then - Exception should be caught and match expected type
-            assertThat(e).isInstanceOf(RuntimeException::class.java)
-            assertThat(e.message).isEqualTo("Unexpected error")
+        getCoinDetailUseCase(params).test {
+            val result = awaitItem()
+            assertThat(result.isFailure).isTrue()
+            assertThat(result.exceptionOrNull()).isInstanceOf(RuntimeException::class.java)
+            assertThat(result.exceptionOrNull()?.message).isEqualTo("Unexpected error")
+            awaitComplete()
         }
 
         coVerify(exactly = 1) {
@@ -272,7 +269,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -307,7 +304,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When
         getCoinDetailUseCase(params).test {
@@ -333,7 +330,7 @@ class GetCoinDetailUseCaseTest {
 
         coEvery {
             coinDetailRepository.getCoinDetail(coinId)
-        } returns flow { emit(Result.success(coinDetail)) }
+        } returns Result.success(coinDetail)
 
         // When - First call
         getCoinDetailUseCase(params).test {

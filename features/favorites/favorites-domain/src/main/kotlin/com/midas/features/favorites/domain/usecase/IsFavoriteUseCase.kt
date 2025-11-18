@@ -2,6 +2,8 @@ package com.midas.features.favorites.domain.usecase
 
 import com.midas.features.favorites.domain.repository.FavoritesRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -19,8 +21,10 @@ class IsFavoriteUseCase @Inject constructor(
      *
      * @return Result indicating success or failure with message
      */
-    suspend operator fun invoke(params: Params): Flow<Result<Boolean>> {
-        return favoritesRepository.isFavorite(params.coinId)
+    operator fun invoke(params: Params): Flow<Result<Boolean>> = flow {
+        emit(favoritesRepository.isFavorite(params.coinId))
+    }.catch { e ->
+        emit(Result.failure(e))
     }
 
     data class Params(

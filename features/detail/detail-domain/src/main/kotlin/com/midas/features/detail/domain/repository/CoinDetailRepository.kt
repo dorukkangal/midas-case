@@ -12,5 +12,5 @@ interface CoinDetailRepository {
      */
     suspend fun getCoinDetail(
         coinId: String,
-    ): Flow<Result<CoinDetail>>
+    ): Result<CoinDetail>
 }
