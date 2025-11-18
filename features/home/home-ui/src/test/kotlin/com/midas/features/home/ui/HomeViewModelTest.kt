@@ -97,7 +97,7 @@ class HomeViewModelTest {
             val state = awaitItem()
             assertThat(state.coins).hasSize(2)
             assertThat(state.isLoading).isFalse()
-            assertThat(state.loadCoinsError).isNull()
+            assertThat(state.loadError).isNull()
         }
     }
 
@@ -121,8 +121,8 @@ class HomeViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.isLoading).isFalse()
-            assertThat(state.loadCoinsError).isNotNull()
-            assertThat(state.loadCoinsError?.message).isEqualTo("Network error")
+            assertThat(state.loadError).isNotNull()
+            assertThat(state.loadError?.message).isEqualTo("Network error")
         }
     }
 
@@ -314,7 +314,7 @@ class HomeViewModelTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            assertThat(state.loadCoinsError).isNull()
+            assertThat(state.loadError).isNull()
             assertThat(state.loadTrendingCoinsError).isNull()
         }
     }

@@ -2,7 +2,6 @@ package com.midas.features.home.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.midas.core.ui.model.ErrorUiState
 import com.midas.features.home.domain.usecase.GetCoinsUseCase
 import com.midas.features.home.domain.usecase.GetTrendingCoinsUseCase
 import com.midas.features.home.domain.usecase.SearchCoinsUseCase
@@ -83,10 +82,8 @@ class HomeViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    isTrendingLoading = true,
                     isRefreshing = false,
-                    loadCoinsError = null,
-                    loadTrendingCoinsError = null
+                    loadError = null,
                 )
             }
 
@@ -104,7 +101,7 @@ class HomeViewModel @Inject constructor(
                             it.copy(
                                 coins = coins.map { coin -> coin.toCoinUiModel() },
                                 isLoading = false,
-                                loadCoinsError = null
+                                loadError = null
                             )
                         }
                     },
@@ -112,9 +109,7 @@ class HomeViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                loadCoinsError = ErrorUiState(
-                                    message = error.message,
-                                ),
+                                loadError = error,
                             )
                         }
                     }
@@ -126,18 +121,16 @@ class HomeViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 trendingCoins = trendingCoins.map { coin -> coin.toCoinUiModel() },
-                                isTrendingLoading = false,
-                                loadTrendingCoinsError = null
+                                isLoading = false,
+                                loadError = null
                             )
                         }
                     },
                     onFailure = { error ->
                         _uiState.update {
                             it.copy(
-                                isTrendingLoading = false,
-                                loadTrendingCoinsError = ErrorUiState(
-                                    message = error.message,
-                                ),
+                                isLoading = false,
+                                loadError = error,
                             )
                         }
                     }
@@ -202,8 +195,7 @@ class HomeViewModel @Inject constructor(
     private fun dismissError() {
         _uiState.update {
             it.copy(
-                loadCoinsError = null,
-                loadTrendingCoinsError = null
+                loadError = null,
             )
         }
     }

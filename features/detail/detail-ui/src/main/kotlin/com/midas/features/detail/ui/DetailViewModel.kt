@@ -3,7 +3,6 @@ package com.midas.features.detail.ui
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.midas.core.ui.model.ErrorUiState
 import com.midas.features.detail.domain.usecase.GetCoinDetailUseCase
 import com.midas.features.detail.ui.mapper.toCoin
 import com.midas.features.detail.ui.mapper.toCoinDetailUiModel
@@ -55,7 +54,7 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isLoading = true,
+                    isDetailLoading = true,
                     isFavoriteLoading = true,
                     loadDetailError = null,
                     loadFavoriteError = null,
@@ -81,7 +80,7 @@ class DetailViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 coinDetail = coinDetail.toCoinDetailUiModel(),
-                                isLoading = false,
+                                isDetailLoading = false,
                                 loadDetailError = null,
                             )
                         }
@@ -89,10 +88,8 @@ class DetailViewModel @Inject constructor(
                     onFailure = { error ->
                         _uiState.update {
                             it.copy(
-                                isLoading = false,
-                                loadDetailError = ErrorUiState(
-                                    message = error.message,
-                                ),
+                                isDetailLoading = false,
+                                loadDetailError = error,
                             )
                         }
                     }
@@ -112,9 +109,7 @@ class DetailViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isFavoriteLoading = false,
-                                loadFavoriteError = ErrorUiState(
-                                    message = error.message,
-                                ),
+                                loadFavoriteError = error,
                             )
                         }
                     }
@@ -152,9 +147,7 @@ class DetailViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isFavoriteLoading = false,
-                                loadDetailError = ErrorUiState(
-                                    message = error.message,
-                                ),
+                                loadDetailError = error,
                             )
                         }
                     }

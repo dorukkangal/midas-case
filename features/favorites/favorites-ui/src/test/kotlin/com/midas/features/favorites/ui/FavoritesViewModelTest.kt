@@ -68,8 +68,8 @@ class FavoritesViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.favorites).hasSize(2)
-            assertThat(state.isLoading).isFalse()
-            assertThat(state.error).isNull()
+            assertThat(state.isFavoritesLoading).isFalse()
+            assertThat(state.loadFavoritesError).isNull()
         }
 
         coVerify(exactly = 1) { getAllFavoritesUseCase(any()) }
@@ -103,7 +103,7 @@ class FavoritesViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.favorites).hasSize(3)
-            assertThat(state.isLoading).isFalse()
+            assertThat(state.isFavoritesLoading).isFalse()
         }
 
         coVerify(atLeast = 2) { getAllFavoritesUseCase(any()) }
@@ -129,9 +129,9 @@ class FavoritesViewModelTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
-            assertThat(state.error).isNotNull()
-            assertThat(state.error?.message).isEqualTo("Database error")
+            assertThat(state.isFavoritesLoading).isFalse()
+            assertThat(state.loadFavoritesError).isNotNull()
+            assertThat(state.loadFavoritesError?.message).isEqualTo("Database error")
         }
     }
 
@@ -212,8 +212,8 @@ class FavoritesViewModelTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            assertThat(state.isFavoriteLoading).isFalse()
-            assertThat(state.loadFavoriteError).isNotNull()
+            assertThat(state.isUpdateFavoriteLoading).isFalse()
+            assertThat(state.updateFavoriteError).isNotNull()
         }
     }
 
@@ -240,8 +240,8 @@ class FavoritesViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.favorites).isEmpty()
-            assertThat(state.isLoading).isFalse()
-            assertThat(state.error).isNull()
+            assertThat(state.isFavoritesLoading).isFalse()
+            assertThat(state.loadFavoritesError).isNull()
         }
 
         coVerify(exactly = 1) { clearAllFavoritesUseCase() }
@@ -270,9 +270,9 @@ class FavoritesViewModelTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
-            assertThat(state.error).isNotNull()
-            assertThat(state.error?.message).isEqualTo("Clear failed")
+            assertThat(state.isFavoritesLoading).isFalse()
+            assertThat(state.loadFavoritesError).isNotNull()
+            assertThat(state.loadFavoritesError?.message).isEqualTo("Clear failed")
         }
     }
 
@@ -299,8 +299,8 @@ class FavoritesViewModelTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            assertThat(state.error).isNull()
-            assertThat(state.loadFavoriteError).isNull()
+            assertThat(state.loadFavoritesError).isNull()
+            assertThat(state.updateFavoriteError).isNull()
         }
     }
 

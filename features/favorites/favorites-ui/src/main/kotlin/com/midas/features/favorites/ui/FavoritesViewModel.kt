@@ -2,7 +2,6 @@ package com.midas.features.favorites.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.midas.core.ui.model.ErrorUiState
 import com.midas.features.favorites.domain.usecase.ClearAllFavoritesUseCase
 import com.midas.features.favorites.domain.usecase.GetAllFavoritesUseCase
 import com.midas.features.favorites.domain.usecase.ToggleFavoriteUseCase
@@ -45,8 +44,8 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isLoading = true,
-                    error = null
+                    isFavoritesLoading = true,
+                    loadFavoritesError = null
                 )
             }
 
@@ -60,18 +59,16 @@ class FavoritesViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 favorites = favorites.map { coin -> coin.toCoinUiModel() },
-                                isLoading = false,
-                                error = null
+                                isFavoritesLoading = false,
+                                loadFavoritesError = null
                             )
                         }
                     },
                     onFailure = { error ->
                         _uiState.update {
                             it.copy(
-                                isLoading = false,
-                                error = ErrorUiState(
-                                    message = error.message,
-                                ),
+                                isFavoritesLoading = false,
+                                loadFavoritesError = error,
                             )
                         }
                     }
@@ -84,8 +81,8 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isFavoriteLoading = true,
-                    error = null
+                    isUpdateFavoriteLoading = true,
+                    loadFavoritesError = null
                 )
             }
 
@@ -101,10 +98,8 @@ class FavoritesViewModel @Inject constructor(
                     onFailure = { error ->
                         _uiState.update {
                             it.copy(
-                                isFavoriteLoading = false,
-                                loadFavoriteError = ErrorUiState(
-                                    message = error.message,
-                                ),
+                                isUpdateFavoriteLoading = false,
+                                updateFavoriteError = error,
                             )
                         }
                     }
@@ -117,8 +112,8 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isLoading = true,
-                    error = null
+                    isFavoritesLoading = true,
+                    loadFavoritesError = null
                 )
             }
 
@@ -129,18 +124,16 @@ class FavoritesViewModel @Inject constructor(
                             _uiState.update {
                                 it.copy(
                                     favorites = emptyList(),
-                                    isLoading = false,
-                                    error = null
+                                    isFavoritesLoading = false,
+                                    loadFavoritesError = null
                                 )
                             }
                         },
                         onFailure = { error ->
                             _uiState.update {
                                 it.copy(
-                                    isLoading = false,
-                                    error = ErrorUiState(
-                                        message = error.message,
-                                    ),
+                                    isFavoritesLoading = false,
+                                    loadFavoritesError = error,
                                 )
                             }
                         }
@@ -159,8 +152,8 @@ class FavoritesViewModel @Inject constructor(
     private fun dismissError() {
         _uiState.update {
             it.copy(
-                error = null,
-                loadFavoriteError = null,
+                loadFavoritesError = null,
+                updateFavoriteError = null,
             )
         }
     }

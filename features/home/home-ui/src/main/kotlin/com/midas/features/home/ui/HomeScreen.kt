@@ -119,17 +119,7 @@ fun HomeScreen(
             }
 
             // Error Dialogs
-            uiState.loadCoinsError?.let { error ->
-                PopupDialog(
-                    message = error.message
-                        ?: stringResource(com.midas.core.ui.R.string.unknown_error),
-                    confirmButton = stringResource(com.midas.core.ui.R.string.retry),
-                    onConfirm = onRetryClick,
-                    onDismiss = onErrorDismiss
-                )
-            }
-
-            uiState.loadTrendingCoinsError?.let { error ->
+            uiState.loadError?.let { error ->
                 PopupDialog(
                     message = error.message
                         ?: stringResource(com.midas.core.ui.R.string.unknown_error),
@@ -156,7 +146,7 @@ private fun MainContent(
         item {
             TrendingSection(
                 trendingCoins = uiState.trendingCoins,
-                isLoading = uiState.isTrendingLoading,
+                isLoading = uiState.isLoading,
                 onCoinClick = onCoinClick
             )
         }

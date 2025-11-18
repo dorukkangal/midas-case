@@ -94,7 +94,7 @@ fun DetailScreen(
                 .padding(innerPadding)
         ) {
             when {
-                uiState.isLoading && uiState.coinDetail == null -> {
+                uiState.isDetailLoading && uiState.coinDetail == null -> {
                     LoadingState()
                 }
 
@@ -117,7 +117,7 @@ fun DetailScreen(
 
                 uiState.coinDetail != null -> {
                     PullToRefreshBox(
-                        isRefreshing = uiState.isLoading,
+                        isRefreshing = uiState.isDetailLoading,
                         onRefresh = onRefresh,
                     ) {
                         DetailContent(

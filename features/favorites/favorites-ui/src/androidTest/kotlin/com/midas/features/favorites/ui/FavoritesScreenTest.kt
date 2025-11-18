@@ -22,7 +22,7 @@ class FavoritesScreenTest {
     @Test
     fun favoritesScreen_displaysLoadingState() {
         // Given
-        val uiState = FavoritesUiState(isLoading = true)
+        val uiState = FavoritesUiState(isFavoritesLoading = true)
 
         // When
         composeTestRule.setContent {
@@ -86,7 +86,7 @@ class FavoritesScreenTest {
         // Given
         val uiState = FavoritesUiState(
             favorites = emptyList(),
-            isLoading = false
+            isFavoritesLoading = false
         )
 
         // When

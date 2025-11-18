@@ -131,20 +131,20 @@ fun FavoritesScreen(
                 .padding(innerPadding)
         ) {
             when {
-                uiState.isLoading && uiState.favorites.isEmpty() -> {
+                uiState.isFavoritesLoading && uiState.favorites.isEmpty() -> {
                     LoadingState()
                 }
 
-                uiState.error != null -> {
+                uiState.loadFavoritesError != null -> {
                     ErrorState(
-                        message = uiState.error.message
+                        message = uiState.loadFavoritesError.message
                             ?: stringResource(com.midas.core.ui.R.string.unknown_error),
                         onRetryClick = onRetryClick,
                         onErrorDismiss = onErrorDismiss,
                     )
                 }
 
-                uiState.loadFavoriteError != null -> {
+                uiState.updateFavoriteError != null -> {
                     ErrorState(
                         message = stringResource(R.string.failed_to_update_favorites),
                         onRetryClick = onRetryClick,
@@ -158,7 +158,7 @@ fun FavoritesScreen(
 
                 else -> {
                     PullToRefreshBox(
-                        isRefreshing = uiState.isLoading,
+                        isRefreshing = uiState.isFavoritesLoading,
                         onRefresh = onRefresh,
                     ) {
                         FavoritesContent(

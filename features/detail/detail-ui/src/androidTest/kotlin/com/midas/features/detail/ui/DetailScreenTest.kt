@@ -22,7 +22,7 @@ class DetailScreenTest {
     @Test
     fun detailScreen_displaysLoadingState() {
         // Given
-        val uiState = DetailUiState(isLoading = true)
+        val uiState = DetailUiState(isDetailLoading = true)
 
         // When
         composeTestRule.setContent {
