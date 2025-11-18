@@ -160,13 +160,6 @@ private fun MainContent(
             )
         }
 
-        // Loading State
-        if (uiState.isLoading && uiState.coins.isEmpty()) {
-            items(10) {
-                CoinListItemSkeleton()
-            }
-        }
-
         // Coins List
         items(
             items = uiState.coins,
@@ -176,6 +169,24 @@ private fun MainContent(
                 coin = coin,
                 onClick = { onCoinClick(coin) }
             )
+        }
+
+        // Loading State
+        if (uiState.isLoading) {
+            if (uiState.coins.isEmpty()) {
+                items(10) {
+                    CoinListItemSkeleton()
+                }
+            } else {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
         }
     }
 }
@@ -187,24 +198,11 @@ private fun TrendingSection(
     onCoinClick: (CoinUiModel) -> Unit
 ) {
     Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.trending),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(MaterialTheme.sizing.iconSizeSmall),
-                    strokeWidth = 2.dp
-                )
-            }
-        }
+        Text(
+            text = stringResource(R.string.trending),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
 
         Spacer(modifier = Modifier.height(MaterialTheme.sizing.spaceSmall))
 

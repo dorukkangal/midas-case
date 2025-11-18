@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +47,6 @@ import coil.request.ImageRequest
 import com.midas.core.ui.components.PullToRefreshBox
 import com.midas.core.ui.dialog.PopupDialog
 import com.midas.core.ui.theme.sizing
-import com.midas.core.ui.util.debouncedClickable
 import com.midas.core.ui.util.rememberDebouncedCallback
 import com.midas.features.favorites.ui.model.CoinUiModel
 import com.midas.features.favorites.ui.model.SortOrderUiModel
@@ -113,14 +114,23 @@ fun FavoritesScreen(
                                 }
                             )
                         }
+
+                        HorizontalDivider()
+
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.clear_all),
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            },
+                            onClick = {
+                                onClearAll()
+                                showSortMenu = false
+                                showClearDialog = true
+                            }
+                        )
                     }
-                    Text(
-                        text = stringResource(R.string.clear_all),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.debouncedClickable {
-                            showClearDialog = true
-                        }
-                    )
                 }
             )
         }
@@ -132,7 +142,9 @@ fun FavoritesScreen(
         ) {
             when {
                 uiState.isFavoritesLoading && uiState.favorites.isEmpty() -> {
-                    LoadingState()
+                    LoadingState(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 uiState.loadFavoritesError != null -> {
@@ -153,7 +165,9 @@ fun FavoritesScreen(
                 }
 
                 uiState.favorites.isEmpty() -> {
-                    EmptyState()
+                    EmptyState(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 else -> {
@@ -224,8 +238,14 @@ private fun FavoritesContent(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
+
+                Spacer(modifier = Modifier.weight(1f))
+
                 Text(
-                    text = stringResource(R.string.sorted_by, sortOrder?.displayName ?: "-"),
+                    text = stringResource(
+                        R.string.sorted_by,
+                        sortOrder?.displayName?.let { stringResource(it) } ?: "-"
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -339,7 +359,6 @@ private fun FavoriteCoinItem(
                 Icon(
                     Icons.Filled.Delete,
                     contentDescription = stringResource(R.string.remove_from_favorites),
-                    tint = MaterialTheme.colorScheme.error
                 )
             }
         }

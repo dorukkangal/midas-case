@@ -81,7 +81,7 @@ class HomeScreenTest {
 
         // Then
         composeTestRule
-            .onNodeWithText("\uD83D\uDD25 Trending")
+            .onNodeWithText("Trending")
             .assertExists()
             .assertIsDisplayed()
 

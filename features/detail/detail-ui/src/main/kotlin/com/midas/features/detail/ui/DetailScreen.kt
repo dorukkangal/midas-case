@@ -95,7 +95,9 @@ fun DetailScreen(
         ) {
             when {
                 uiState.isDetailLoading && uiState.coinDetail == null -> {
-                    LoadingState()
+                    LoadingState(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 uiState.loadDetailError != null -> {
