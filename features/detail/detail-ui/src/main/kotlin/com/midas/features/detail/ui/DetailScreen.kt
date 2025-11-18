@@ -39,6 +39,7 @@ import coil.request.ImageRequest
 import com.midas.core.ui.components.PullToRefreshBox
 import com.midas.core.ui.dialog.PopupDialog
 import com.midas.core.ui.theme.sizing
+import com.midas.core.ui.util.rememberDebouncedCallback
 import com.midas.features.detail.ui.model.CoinDetailUiModel
 import com.midas.features.detail.ui.state.DetailUiState
 
@@ -65,7 +66,7 @@ fun DetailScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
+                    IconButton(onClick = rememberDebouncedCallback(callback = onNavigateUp)) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(com.midas.core.ui.R.string.back)
@@ -73,7 +74,7 @@ fun DetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onToggleFavorite) {
+                    IconButton(onClick = rememberDebouncedCallback(callback = onToggleFavorite)) {
                         Icon(
                             imageVector = if (uiState.isFavorite) {
                                 Icons.Filled.Bookmark

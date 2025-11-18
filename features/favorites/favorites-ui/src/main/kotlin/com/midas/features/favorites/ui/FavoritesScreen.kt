@@ -1,6 +1,5 @@
 package com.midas.features.favorites.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +45,8 @@ import coil.request.ImageRequest
 import com.midas.core.ui.components.PullToRefreshBox
 import com.midas.core.ui.dialog.PopupDialog
 import com.midas.core.ui.theme.sizing
+import com.midas.core.ui.util.debouncedClickable
+import com.midas.core.ui.util.rememberDebouncedCallback
 import com.midas.features.favorites.ui.model.CoinUiModel
 import com.midas.features.favorites.ui.model.SortOrderUiModel
 import com.midas.features.favorites.ui.state.FavoritesUiState
@@ -79,7 +80,7 @@ fun FavoritesScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
+                    IconButton(onClick = rememberDebouncedCallback(callback = onNavigateUp)) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(com.midas.core.ui.R.string.back)
@@ -116,7 +117,7 @@ fun FavoritesScreen(
                     Text(
                         text = stringResource(R.string.clear_all),
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.debouncedClickable {
                             showClearDialog = true
                         }
                     )
