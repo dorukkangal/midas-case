@@ -6,6 +6,7 @@ data class HomeUiState(
     val coins: List<CoinUiModel> = emptyList(),
     val trendingCoins: List<CoinUiModel> = emptyList(),
     val searchResults: List<CoinUiModel> = emptyList(),
+    val page: Int = 1,
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val isSearching: Boolean = false,

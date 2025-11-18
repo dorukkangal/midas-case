@@ -26,6 +26,7 @@ fun NavGraphBuilder.home(navController: NavController) {
             onFavoritesClick = { navController.navigate(Routes.Favorites) },
             onSearchQueryChange = { viewModel.handleAction(HomeUiAction.SearchCoins(it)) },
             onClearSearch = { viewModel.handleAction(HomeUiAction.ClearSearch) },
+            onLoadMore = { viewModel.handleAction(HomeUiAction.LoadMore) },
             onRefresh = { viewModel.handleAction(HomeUiAction.RefreshData) },
             onRetryClick = { viewModel.handleAction(HomeUiAction.RetryLoading) },
             onErrorDismiss = { viewModel.handleAction(HomeUiAction.DismissError) }

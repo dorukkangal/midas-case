@@ -37,7 +37,7 @@ class GetCoinsUseCaseTest {
             coinRepository.getCoins(
                 vsCurrency = "usd",
                 order = "market_cap_desc",
-                perPage = 50,
+                perPage = 20,
                 page = 1
             )
         } returns Result.success(mockCoins)
@@ -57,7 +57,7 @@ class GetCoinsUseCaseTest {
             coinRepository.getCoins(
                 vsCurrency = "usd",
                 order = "market_cap_desc",
-                perPage = 50,
+                perPage = 20,
                 page = 1
             )
         }
@@ -104,7 +104,7 @@ class GetCoinsUseCaseTest {
             coinRepository.getCoins(
                 vsCurrency = "usd",
                 order = "price_desc",
-                perPage = 50,
+                perPage = 20,
                 page = 1
             )
         } returns Result.success(mockCoins)
@@ -280,7 +280,7 @@ class GetCoinsUseCaseTest {
             coinRepository.getCoins(
                 vsCurrency = "eur",
                 order = "market_cap_desc",
-                perPage = 50,
+                perPage = 20,
                 page = 1
             )
         } returns Result.success(mockCoins)
@@ -301,7 +301,7 @@ class GetCoinsUseCaseTest {
             coinRepository.getCoins(
                 vsCurrency = "eur",
                 order = "market_cap_desc",
-                perPage = 50,
+                perPage = 20,
                 page = 1
             )
         }
@@ -317,7 +317,7 @@ class GetCoinsUseCaseTest {
             coinRepository.getCoins(
                 vsCurrency = "usd",
                 order = "market_cap_desc",
-                perPage = 50,
+                perPage = 20,
                 page = 2
             )
         } returns Result.success(mockCoins)
@@ -338,7 +338,7 @@ class GetCoinsUseCaseTest {
             coinRepository.getCoins(
                 vsCurrency = "usd",
                 order = "market_cap_desc",
-                perPage = 50,
+                perPage = 20,
                 page = 2
             )
         }

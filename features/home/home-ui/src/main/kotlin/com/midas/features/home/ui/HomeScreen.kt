@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,12 +36,17 @@ import com.midas.core.ui.components.CoinListItemSkeleton
 import com.midas.core.ui.components.PullToRefreshBox
 import com.midas.core.ui.components.TrendingCoinCardSkeleton
 import com.midas.core.ui.dialog.PopupDialog
+import com.midas.core.ui.extensions.lastVisibleItemIndex
+import com.midas.core.ui.extensions.totalItemCount
 import com.midas.core.ui.theme.sizing
 import com.midas.features.home.ui.components.CoinListItem
 import com.midas.features.home.ui.components.SearchBar
 import com.midas.features.home.ui.components.TrendingCoinCard
 import com.midas.features.home.ui.model.CoinUiModel
 import com.midas.features.home.ui.state.HomeUiState
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +57,7 @@ fun HomeScreen(
     onFavoritesClick: () -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
+    onLoadMore: () -> Unit,
     onRefresh: () -> Unit,
     onRetryClick: () -> Unit,
     onErrorDismiss: () -> Unit,
@@ -112,6 +120,7 @@ fun HomeScreen(
                     ) {
                         MainContent(
                             uiState = uiState,
+                            onLoadMore = onLoadMore,
                             onCoinClick = onCoinClick
                         )
                     }
@@ -132,12 +141,34 @@ fun HomeScreen(
     }
 }
 
+@OptIn(FlowPreview::class)
 @Composable
 private fun MainContent(
     uiState: HomeUiState,
+    onLoadMore: () -> Unit,
     onCoinClick: (CoinUiModel) -> Unit
 ) {
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            if (uiState.isLoading) return@snapshotFlow false
+
+            val totalItemsCount = listState.totalItemCount
+            val lastVisibleItemIndex = listState.lastVisibleItemIndex
+
+            // Load more condition
+            totalItemsCount > 0 &&
+                    lastVisibleItemIndex >= (totalItemsCount - 3)
+        }.debounce(300)
+            .filter { it }
+            .collect {
+                onLoadMore()
+            }
+    }
+
     LazyColumn(
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(
             MaterialTheme.sizing.spaceMedium
         )

@@ -6,6 +6,7 @@ package com.midas.features.home.ui.state
  */
 sealed class HomeUiAction {
     data class SearchCoins(val query: String) : HomeUiAction()
+    data object LoadMore : HomeUiAction()
     data object RefreshData : HomeUiAction()
     data object RetryLoading : HomeUiAction()
     data object ClearSearch : HomeUiAction()

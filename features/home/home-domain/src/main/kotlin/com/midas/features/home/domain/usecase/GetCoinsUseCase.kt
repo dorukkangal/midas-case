@@ -72,7 +72,7 @@ class GetCoinsUseCase @Inject constructor(
     data class Params(
         val vsCurrency: String = "usd",
         val sortOrder: SortOrder = SortOrder.MARKET_CAP_DESC,
-        val perPage: Int = 50,
+        val perPage: Int = 20,
         val page: Int = 1,
     )
 }

@@ -44,6 +44,7 @@ class HomeViewModel @Inject constructor(
     fun handleAction(action: HomeUiAction) {
         when (action) {
             is HomeUiAction.SearchCoins -> updateSearchQuery(action.query)
+            is HomeUiAction.LoadMore -> loadMore()
             is HomeUiAction.RefreshData -> refreshAllData()
             is HomeUiAction.RetryLoading -> retryLoading()
             is HomeUiAction.ClearSearch -> clearSearch()
@@ -72,6 +73,55 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    private fun searchCoins(query: String) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isSearching = true
+                )
+            }
+
+            searchCoinsUseCase(query)
+                .collect { result ->
+                    result.fold(
+                        onSuccess = { searchResults ->
+                            _uiState.update {
+                                it.copy(
+                                    searchResults = searchResults.map { coin -> coin.toCoinUiModel() },
+                                    isSearching = false
+                                )
+                            }
+                        },
+                        onFailure = {
+                            _uiState.update {
+                                it.copy(
+                                    searchResults = emptyList(),
+                                    isSearching = false
+                                )
+                            }
+                        }
+                    )
+                }
+        }
+    }
+
+    private fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    private fun refreshAllData() {
+        _uiState.update {
+            it.copy(
+                page = 1,
+            )
+        }
+        loadCoinsAndTrending()
+    }
+
+    private fun retryLoading() {
+        loadCoinsAndTrending()
+    }
+
     /**
      * Loads both coins and trending coins in parallel using combine.
      * This ensures both data sets are fetched simultaneously for better performance.
@@ -89,7 +139,7 @@ class HomeViewModel @Inject constructor(
 
             // Combine both flows to load data in parallel
             combine(
-                getCoinsUseCase(),
+                getCoinsUseCase(params = GetCoinsUseCase.Params(page = _uiState.value.page)),
                 getTrendingCoinsUseCase()
             ) { coinsResult, trendingResult ->
                 Pair(coinsResult, trendingResult)
@@ -144,48 +194,41 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun searchCoins(query: String) {
+    private fun loadMore() {
         viewModelScope.launch {
+            // Set loading states
             _uiState.update {
                 it.copy(
-                    isSearching = true
+                    isLoading = true,
+                    isRefreshing = false,
+                    loadError = null,
                 )
             }
 
-            searchCoinsUseCase(query)
+            getCoinsUseCase(params = GetCoinsUseCase.Params(page = _uiState.value.page))
                 .collect { result ->
                     result.fold(
-                        onSuccess = { searchResults ->
+                        onSuccess = { coins ->
                             _uiState.update {
                                 it.copy(
-                                    searchResults = searchResults.map { coin -> coin.toCoinUiModel() },
-                                    isSearching = false
+                                    coins = it.coins + coins.map { coin -> coin.toCoinUiModel() },
+                                    page = it.page + 1,
+                                    isLoading = false,
+                                    loadError = null
                                 )
                             }
                         },
-                        onFailure = {
+                        onFailure = { error ->
                             _uiState.update {
                                 it.copy(
-                                    searchResults = emptyList(),
-                                    isSearching = false
+                                    isLoading = false,
+                                    loadError = error,
                                 )
                             }
                         }
                     )
                 }
         }
-    }
-
-    private fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
-    }
-
-    private fun refreshAllData() {
-        loadCoinsAndTrending()
-    }
-
-    private fun retryLoading() {
-        loadCoinsAndTrending()
     }
 
     private fun clearSearch() {
