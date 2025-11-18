@@ -47,7 +47,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `init loads coins and trending coins successfully`() = runTest {
+    fun `init loads coins and trending coins in parallel successfully`() = runTest {
         // Given
         val mockCoins = listOf(createMockCoin())
         val mockTrendingCoins = listOf(createMockCoin(id = "ethereum"))
@@ -63,7 +63,7 @@ class HomeViewModelTest {
         viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
         advanceUntilIdle()
 
-        // Then
+        // Then - Both should be loaded using combine (parallel)
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.coins).hasSize(1)
@@ -269,7 +269,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `handleAction RefreshData refreshes both coins and trending`() = runTest {
+    fun `handleAction RefreshData refreshes both coins and trending in parallel`() = runTest {
         // Given
         val mockCoins = listOf(createMockCoin())
         val mockTrendingCoins = listOf(createMockCoin(id = "ethereum"))
@@ -288,7 +288,7 @@ class HomeViewModelTest {
         viewModel.handleAction(HomeUiAction.RefreshData)
         advanceUntilIdle()
 
-        // Then - Both should be called at least twice (init + refresh)
+        // Then - Both should be called at least twice (init + refresh) using combine
         coVerify(atLeast = 2) { getCoinsUseCase(any()) }
         coVerify(atLeast = 2) { getTrendingCoinsUseCase() }
     }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -43,8 +44,6 @@ class HomeViewModel @Inject constructor(
 
     fun handleAction(action: HomeUiAction) {
         when (action) {
-            is HomeUiAction.LoadCoins -> loadCoins()
-            is HomeUiAction.LoadTrendingCoins -> loadTrendingCoins()
             is HomeUiAction.SearchCoins -> updateSearchQuery(action.query)
             is HomeUiAction.RefreshData -> refreshAllData()
             is HomeUiAction.RetryLoading -> retryLoading()
@@ -74,78 +73,81 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun loadCoins() {
+    /**
+     * Loads both coins and trending coins in parallel using combine.
+     * This ensures both data sets are fetched simultaneously for better performance.
+     */
+    private fun loadCoinsAndTrending() {
         viewModelScope.launch {
+            // Set loading states
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    isRefreshing = false,
-                    loadCoinsError = null
-                )
-            }
-
-            getCoinsUseCase()
-                .collect { result ->
-                    result.fold(
-                        onSuccess = { coins ->
-                            _uiState.update {
-                                it.copy(
-                                    coins = coins.map { coin -> coin.toCoinUiModel() },
-                                    isLoading = false,
-                                    isRefreshing = false,
-                                    loadCoinsError = null
-                                )
-                            }
-                        },
-                        onFailure = { error ->
-                            _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    isRefreshing = false,
-                                    loadCoinsError = ErrorUiState(
-                                        message = error.message,
-                                    ),
-                                )
-                            }
-                        }
-                    )
-                }
-        }
-    }
-
-    private fun loadTrendingCoins() {
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
                     isTrendingLoading = true,
+                    isRefreshing = false,
+                    loadCoinsError = null,
                     loadTrendingCoinsError = null
                 )
             }
 
-            getTrendingCoinsUseCase()
-                .collect { result ->
-                    result.fold(
-                        onSuccess = { trendingCoins ->
-                            _uiState.update {
-                                it.copy(
-                                    trendingCoins = trendingCoins.map { coin -> coin.toCoinUiModel() },
-                                    isTrendingLoading = false,
-                                    loadTrendingCoinsError = null
-                                )
-                            }
-                        },
-                        onFailure = { error ->
-                            _uiState.update {
-                                it.copy(
-                                    isTrendingLoading = false,
-                                    loadTrendingCoinsError = ErrorUiState(
-                                        message = error.message,
-                                    ),
-                                )
-                            }
+            // Combine both flows to load data in parallel
+            combine(
+                getCoinsUseCase(),
+                getTrendingCoinsUseCase()
+            ) { coinsResult, trendingResult ->
+                Pair(coinsResult, trendingResult)
+            }.collect { (coinsResult, trendingResult) ->
+                // Handle coins result
+                coinsResult.fold(
+                    onSuccess = { coins ->
+                        _uiState.update {
+                            it.copy(
+                                coins = coins.map { coin -> coin.toCoinUiModel() },
+                                isLoading = false,
+                                loadCoinsError = null
+                            )
                         }
-                    )
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                loadCoinsError = ErrorUiState(
+                                    message = error.message,
+                                ),
+                            )
+                        }
+                    }
+                )
+
+                // Handle trending result
+                trendingResult.fold(
+                    onSuccess = { trendingCoins ->
+                        _uiState.update {
+                            it.copy(
+                                trendingCoins = trendingCoins.map { coin -> coin.toCoinUiModel() },
+                                isTrendingLoading = false,
+                                loadTrendingCoinsError = null
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        _uiState.update {
+                            it.copy(
+                                isTrendingLoading = false,
+                                loadTrendingCoinsError = ErrorUiState(
+                                    message = error.message,
+                                ),
+                            )
+                        }
+                    }
+                )
+
+                // Clear refreshing state when both are done
+                _uiState.update {
+                    it.copy(isRefreshing = false)
                 }
+            }
         }
     }
 
@@ -186,13 +188,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun refreshAllData() {
-        loadCoins()
-        loadTrendingCoins()
+        loadCoinsAndTrending()
     }
 
     private fun retryLoading() {
-        loadCoins()
-        loadTrendingCoins()
+        loadCoinsAndTrending()
     }
 
     private fun clearSearch() {

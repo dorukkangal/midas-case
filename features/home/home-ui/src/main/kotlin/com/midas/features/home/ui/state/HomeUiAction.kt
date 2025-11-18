@@ -5,8 +5,6 @@ package com.midas.features.home.ui.state
  * Represents all possible user interactions with the Home screen
  */
 sealed class HomeUiAction {
-    data object LoadCoins : HomeUiAction()
-    data object LoadTrendingCoins : HomeUiAction()
     data class SearchCoins(val query: String) : HomeUiAction()
     data object RefreshData : HomeUiAction()
     data object RetryLoading : HomeUiAction()

@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,7 +39,6 @@ class DetailViewModel @Inject constructor(
         when (action) {
             is DetailUiAction.RefreshDetail -> {
                 loadCoinDetail()
-                checkFavoriteStatus()
             }
 
             is DetailUiAction.ToggleFavorite -> {
@@ -56,16 +56,27 @@ class DetailViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isLoading = true,
+                    isFavoriteLoading = true,
                     loadDetailError = null,
+                    loadFavoriteError = null,
                 )
             }
 
-            getCoinDetailUseCase(
-                params = GetCoinDetailUseCase.Params(
-                    coinId = coinId,
+            combine(
+                getCoinDetailUseCase(
+                    params = GetCoinDetailUseCase.Params(
+                        coinId = coinId,
+                    )
+                ),
+                isFavoriteUseCase(
+                    params = IsFavoriteUseCase.Params(
+                        coinId = coinId,
+                    )
                 )
-            ).collect { result ->
-                result.fold(
+            ) { coinDetailResult, isFavoriteResult ->
+                Pair(coinDetailResult, isFavoriteResult)
+            }.collect { (coinDetailResult, isFavoriteResult) ->
+                coinDetailResult.fold(
                     onSuccess = { coinDetail ->
                         _uiState.update {
                             it.copy(
@@ -86,25 +97,8 @@ class DetailViewModel @Inject constructor(
                         }
                     }
                 )
-            }
-        }
-    }
 
-    private fun checkFavoriteStatus() {
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isFavoriteLoading = true,
-                    loadFavoriteError = null
-                )
-            }
-
-            isFavoriteUseCase(
-                params = IsFavoriteUseCase.Params(
-                    coinId = coinId,
-                )
-            ).collect { result ->
-                result.fold(
+                isFavoriteResult.fold(
                     onSuccess = { isFavorite ->
                         _uiState.update {
                             it.copy(
@@ -118,7 +112,7 @@ class DetailViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isFavoriteLoading = false,
-                                loadDetailError = ErrorUiState(
+                                loadFavoriteError = ErrorUiState(
                                     message = error.message,
                                 ),
                             )
