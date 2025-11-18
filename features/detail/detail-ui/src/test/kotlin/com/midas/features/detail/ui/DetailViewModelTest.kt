@@ -54,83 +54,9 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `init loads coin detail and checks favorite status`() = runTest {
-        // Given
-        val mockCoinDetail = createMockCoinDetail()
-
-        coEvery {
-            getCoinDetailUseCase(any())
-        } returns flow { emit(Result.success(mockCoinDetail)) }
-
-        coEvery {
-            isFavoriteUseCase(any())
-        } returns flow { emit(Result.success(false)) }
-
-        // When
-        viewModel = DetailViewModel(
-            getCoinDetailUseCase,
-            isFavoriteUseCase,
-            toggleFavoriteUseCase,
-            savedStateHandle
-        )
-        advanceUntilIdle()
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertThat(state.coinDetail).isNotNull()
-            assertThat(state.isFavorite).isFalse()
-            assertThat(state.isLoading).isFalse()
-            assertThat(state.loadDetailError).isNull()
-        }
-
-        coVerify(exactly = 1) { getCoinDetailUseCase(any()) }
-        coVerify(exactly = 1) { isFavoriteUseCase(any()) }
-    }
-
-    @Test
-    fun `handleAction RefreshDetail reloads coin detail`() = runTest {
+    fun `initial state is empty before RefreshDetail action`() = runTest {
         // Given
         setupInitialMocks()
-        viewModel = DetailViewModel(
-            getCoinDetailUseCase,
-            isFavoriteUseCase,
-            toggleFavoriteUseCase,
-            savedStateHandle
-        )
-        advanceUntilIdle()
-
-        val refreshedDetail = createMockCoinDetail(name = "Bitcoin Updated")
-        coEvery {
-            getCoinDetailUseCase(any())
-        } returns flow { emit(Result.success(refreshedDetail)) }
-
-        // When
-        viewModel.handleAction(DetailUiAction.RefreshDetail)
-        advanceUntilIdle()
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertThat(state.coinDetail?.name).isEqualTo("Bitcoin Updated")
-            assertThat(state.isLoading).isFalse()
-        }
-
-        coVerify(atLeast = 2) { getCoinDetailUseCase(any()) }
-    }
-
-    @Test
-    fun `loadCoinDetail handles error correctly`() = runTest {
-        // Given
-        val exception = Exception("Network error")
-
-        coEvery {
-            getCoinDetailUseCase(any())
-        } returns flow { emit(Result.failure(exception)) }
-
-        coEvery {
-            isFavoriteUseCase(any())
-        } returns flow { emit(Result.success(false)) }
 
         // When
         viewModel = DetailViewModel(
@@ -145,10 +71,136 @@ class DetailViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.coinDetail).isNull()
-            assertThat(state.isLoading).isFalse()
+            assertThat(state.isFavorite).isFalse()
+            assertThat(state.isDetailLoading).isFalse()
+            assertThat(state.isFavoriteLoading).isFalse()
+            assertThat(state.loadDetailError).isNull()
+        }
+
+        // No use case should be called on init
+        coVerify(exactly = 0) { getCoinDetailUseCase(any()) }
+        coVerify(exactly = 0) { isFavoriteUseCase(any()) }
+    }
+
+    @Test
+    fun `handleAction RefreshDetail loads coin detail and checks favorite status`() = runTest {
+        // Given
+        val mockCoinDetail = createMockCoinDetail()
+
+        coEvery {
+            getCoinDetailUseCase(any())
+        } returns flow { emit(Result.success(mockCoinDetail)) }
+
+        coEvery {
+            isFavoriteUseCase(any())
+        } returns flow { emit(Result.success(false)) }
+
+        viewModel = DetailViewModel(
+            getCoinDetailUseCase,
+            isFavoriteUseCase,
+            toggleFavoriteUseCase,
+            savedStateHandle
+        )
+
+        // When
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.coinDetail).isNotNull()
+            assertThat(state.coinDetail?.name).isEqualTo("Bitcoin")
+            assertThat(state.isFavorite).isFalse()
+            assertThat(state.isDetailLoading).isFalse()
+            assertThat(state.isFavoriteLoading).isFalse()
+            assertThat(state.loadDetailError).isNull()
+        }
+
+        coVerify(exactly = 1) { getCoinDetailUseCase(any()) }
+        coVerify(exactly = 1) { isFavoriteUseCase(any()) }
+    }
+
+    @Test
+    fun `handleAction RefreshDetail reloads coin detail on subsequent calls`() = runTest {
+        // Given
+        val initialDetail = createMockCoinDetail(name = "Bitcoin")
+        coEvery {
+            getCoinDetailUseCase(any())
+        } returns flow { emit(Result.success(initialDetail)) }
+
+        coEvery {
+            isFavoriteUseCase(any())
+        } returns flow { emit(Result.success(false)) }
+
+        viewModel = DetailViewModel(
+            getCoinDetailUseCase,
+            isFavoriteUseCase,
+            toggleFavoriteUseCase,
+            savedStateHandle
+        )
+
+        // First load
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
+        advanceUntilIdle()
+
+        // Update mock for refresh
+        val refreshedDetail = createMockCoinDetail(name = "Bitcoin Updated")
+        coEvery {
+            getCoinDetailUseCase(any())
+        } returns flow { emit(Result.success(refreshedDetail)) }
+
+        // When - Refresh
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.coinDetail?.name).isEqualTo("Bitcoin Updated")
+            assertThat(state.isDetailLoading).isFalse()
+        }
+
+        // Should be called twice (initial + refresh)
+        coVerify(exactly = 2) { getCoinDetailUseCase(any()) }
+        coVerify(exactly = 2) { isFavoriteUseCase(any()) }
+    }
+
+    @Test
+    fun `handleAction RefreshDetail handles error correctly`() = runTest {
+        // Given
+        val exception = Exception("Network error")
+
+        coEvery {
+            getCoinDetailUseCase(any())
+        } returns flow { emit(Result.failure(exception)) }
+
+        coEvery {
+            isFavoriteUseCase(any())
+        } returns flow { emit(Result.success(false)) }
+
+        viewModel = DetailViewModel(
+            getCoinDetailUseCase,
+            isFavoriteUseCase,
+            toggleFavoriteUseCase,
+            savedStateHandle
+        )
+
+        // When
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.coinDetail).isNull()
+            assertThat(state.isDetailLoading).isFalse()
             assertThat(state.loadDetailError).isNotNull()
             assertThat(state.loadDetailError?.message).isEqualTo("Network error")
         }
+
+        coVerify(exactly = 1) { getCoinDetailUseCase(any()) }
+        coVerify(exactly = 1) { isFavoriteUseCase(any()) }
     }
 
     @Test
@@ -161,6 +213,9 @@ class DetailViewModelTest {
             toggleFavoriteUseCase,
             savedStateHandle
         )
+
+        // Load initial data first
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
         advanceUntilIdle()
 
         coEvery {
@@ -202,6 +257,9 @@ class DetailViewModelTest {
             toggleFavoriteUseCase,
             savedStateHandle
         )
+
+        // Load initial data first
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
         advanceUntilIdle()
 
         coEvery {
@@ -234,6 +292,9 @@ class DetailViewModelTest {
             toggleFavoriteUseCase,
             savedStateHandle
         )
+
+        // Load initial data first
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
         advanceUntilIdle()
 
         val exception = Exception("Toggle failed")
@@ -251,6 +312,8 @@ class DetailViewModelTest {
             assertThat(state.isFavoriteLoading).isFalse()
             assertThat(state.loadDetailError).isNotNull()
         }
+
+        coVerify(exactly = 1) { toggleFavoriteUseCase(any()) }
     }
 
     @Test
@@ -272,7 +335,16 @@ class DetailViewModelTest {
             toggleFavoriteUseCase,
             savedStateHandle
         )
+
+        // Trigger error by calling RefreshDetail
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
         advanceUntilIdle()
+
+        // Verify errors exist
+        viewModel.uiState.test {
+            val stateWithError = awaitItem()
+            assertThat(stateWithError.loadDetailError).isNotNull()
+        }
 
         // When
         viewModel.handleAction(DetailUiAction.DismissError)
@@ -287,7 +359,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `checkFavoriteStatus updates isFavorite state`() = runTest {
+    fun `handleAction RefreshDetail checks favorite status and updates state`() = runTest {
         // Given
         val mockCoinDetail = createMockCoinDetail()
 
@@ -299,13 +371,15 @@ class DetailViewModelTest {
             isFavoriteUseCase(any())
         } returns flow { emit(Result.success(true)) }
 
-        // When
         viewModel = DetailViewModel(
             getCoinDetailUseCase,
             isFavoriteUseCase,
             toggleFavoriteUseCase,
             savedStateHandle
         )
+
+        // When
+        viewModel.handleAction(DetailUiAction.RefreshDetail)
         advanceUntilIdle()
 
         // Then
@@ -313,7 +387,12 @@ class DetailViewModelTest {
             val state = awaitItem()
             assertThat(state.isFavorite).isTrue()
             assertThat(state.isFavoriteLoading).isFalse()
+            assertThat(state.coinDetail).isNotNull()
+            assertThat(state.isDetailLoading).isFalse()
         }
+
+        coVerify(exactly = 1) { getCoinDetailUseCase(any()) }
+        coVerify(exactly = 1) { isFavoriteUseCase(any()) }
     }
 
     private fun setupInitialMocks() {

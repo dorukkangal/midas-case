@@ -48,13 +48,9 @@ class FavoritesViewModelTest {
     }
 
     @Test
-    fun `init loads favorites successfully`() = runTest {
+    fun `initial state is empty before LoadFavorites action`() = runTest {
         // Given
-        val mockFavorites = listOf(createMockCoin(), createMockCoin(id = "ethereum"))
-
-        coEvery {
-            getAllFavoritesUseCase(any())
-        } returns flow { emit(Result.success(mockFavorites)) }
+        setupInitialMocks()
 
         // When
         viewModel = FavoritesViewModel(
@@ -62,6 +58,37 @@ class FavoritesViewModelTest {
             toggleFavoriteUseCase,
             clearAllFavoritesUseCase
         )
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.favorites).isEmpty()
+            assertThat(state.isFavoritesLoading).isFalse()
+            assertThat(state.loadFavoritesError).isNull()
+        }
+
+        // No use case should be called on init
+        coVerify(exactly = 0) { getAllFavoritesUseCase(any()) }
+    }
+
+    @Test
+    fun `handleAction LoadFavorites loads favorites successfully`() = runTest {
+        // Given
+        val mockFavorites = listOf(createMockCoin(), createMockCoin(id = "ethereum"))
+
+        coEvery {
+            getAllFavoritesUseCase(any())
+        } returns flow { emit(Result.success(mockFavorites)) }
+
+        viewModel = FavoritesViewModel(
+            getAllFavoritesUseCase,
+            toggleFavoriteUseCase,
+            clearAllFavoritesUseCase
+        )
+
+        // When
+        viewModel.handleAction(FavoritesUiAction.LoadFavorites)
         advanceUntilIdle()
 
         // Then
@@ -76,16 +103,24 @@ class FavoritesViewModelTest {
     }
 
     @Test
-    fun `handleAction LoadFavorites reloads favorites`() = runTest {
+    fun `handleAction LoadFavorites reloads favorites on subsequent calls`() = runTest {
         // Given
-        setupInitialMocks()
+        val initialFavorites = listOf(createMockCoin())
+        coEvery {
+            getAllFavoritesUseCase(any())
+        } returns flow { emit(Result.success(initialFavorites)) }
+
         viewModel = FavoritesViewModel(
             getAllFavoritesUseCase,
             toggleFavoriteUseCase,
             clearAllFavoritesUseCase
         )
+
+        // First load
+        viewModel.handleAction(FavoritesUiAction.LoadFavorites)
         advanceUntilIdle()
 
+        // Update mock for refresh
         val refreshedFavorites = listOf(
             createMockCoin(),
             createMockCoin(id = "ethereum"),
@@ -95,7 +130,7 @@ class FavoritesViewModelTest {
             getAllFavoritesUseCase(any())
         } returns flow { emit(Result.success(refreshedFavorites)) }
 
-        // When
+        // When - Refresh
         viewModel.handleAction(FavoritesUiAction.LoadFavorites)
         advanceUntilIdle()
 
@@ -106,7 +141,7 @@ class FavoritesViewModelTest {
             assertThat(state.isFavoritesLoading).isFalse()
         }
 
-        coVerify(atLeast = 2) { getAllFavoritesUseCase(any()) }
+        coVerify(exactly = 2) { getAllFavoritesUseCase(any()) }
     }
 
     @Test
@@ -118,12 +153,14 @@ class FavoritesViewModelTest {
             getAllFavoritesUseCase(any())
         } returns flow { emit(Result.failure(exception)) }
 
-        // When
         viewModel = FavoritesViewModel(
             getAllFavoritesUseCase,
             toggleFavoriteUseCase,
             clearAllFavoritesUseCase
         )
+
+        // When
+        viewModel.handleAction(FavoritesUiAction.LoadFavorites)
         advanceUntilIdle()
 
         // Then
@@ -133,17 +170,26 @@ class FavoritesViewModelTest {
             assertThat(state.loadFavoritesError).isNotNull()
             assertThat(state.loadFavoritesError?.message).isEqualTo("Database error")
         }
+
+        coVerify(exactly = 1) { getAllFavoritesUseCase(any()) }
     }
 
     @Test
     fun `handleAction ChangeSortOrder changes sort and reloads`() = runTest {
         // Given
-        setupInitialMocks()
+        val mockFavorites = listOf(createMockCoin())
+        coEvery {
+            getAllFavoritesUseCase(any())
+        } returns flow { emit(Result.success(mockFavorites)) }
+
         viewModel = FavoritesViewModel(
             getAllFavoritesUseCase,
             toggleFavoriteUseCase,
             clearAllFavoritesUseCase
         )
+
+        // Load initial data
+        viewModel.handleAction(FavoritesUiAction.LoadFavorites)
         advanceUntilIdle()
 
         // When
@@ -156,27 +202,41 @@ class FavoritesViewModelTest {
             assertThat(state.sortOrder).isEqualTo(SortOrderUiModel.PRICE_DESC)
         }
 
-        coVerify(atLeast = 2) { getAllFavoritesUseCase(any()) }
+        // Should be called twice (initial load + sort change)
+        coVerify(exactly = 2) { getAllFavoritesUseCase(any()) }
     }
 
     @Test
     fun `handleAction RemoveFavorite removes coin and reloads list`() = runTest {
         // Given
-        setupInitialMocks()
+        val mockFavorites = listOf(createMockCoin(), createMockCoin(id = "ethereum"))
+        coEvery {
+            getAllFavoritesUseCase(any())
+        } returns flow { emit(Result.success(mockFavorites)) }
+
         viewModel = FavoritesViewModel(
             getAllFavoritesUseCase,
             toggleFavoriteUseCase,
             clearAllFavoritesUseCase
         )
+
+        // Load initial data
+        viewModel.handleAction(FavoritesUiAction.LoadFavorites)
         advanceUntilIdle()
 
         val coinToRemove = createMockUiCoin()
 
+        // Mock successful removal and subsequent reload
         coEvery {
             toggleFavoriteUseCase(any())
         } returns flow {
             emit(Result.success(ToggleFavoriteUseCase.FavoriteAction.REMOVED))
         }
+
+        val updatedFavorites = listOf(createMockCoin(id = "ethereum"))
+        coEvery {
+            getAllFavoritesUseCase(any())
+        } returns flow { emit(Result.success(updatedFavorites)) }
 
         // When
         viewModel.handleAction(FavoritesUiAction.RemoveFavorite(coinToRemove))
@@ -184,7 +244,7 @@ class FavoritesViewModelTest {
 
         // Then
         coVerify(exactly = 1) { toggleFavoriteUseCase(any()) }
-        coVerify(atLeast = 2) { getAllFavoritesUseCase(any()) }
+        coVerify(exactly = 2) { getAllFavoritesUseCase(any()) } // Initial load + reload after remove
     }
 
     @Test

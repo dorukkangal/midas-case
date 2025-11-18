@@ -47,29 +47,87 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `init loads coins and trending coins in parallel successfully`() = runTest {
+    fun `initial state is empty before RefreshData action`() = runTest {
         // Given
-        val mockCoins = listOf(createMockCoin())
-        val mockTrendingCoins = listOf(createMockCoin(id = "ethereum"))
-
-        coEvery { getCoinsUseCase(any()) } returns flow {
-            emit(Result.success(mockCoins))
-        }
-        coEvery { getTrendingCoinsUseCase() } returns flow {
-            emit(Result.success(mockTrendingCoins))
-        }
+        setupInitialMocks()
 
         // When
         viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
         advanceUntilIdle()
 
-        // Then - Both should be loaded using combine (parallel)
+        // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            assertThat(state.coins).hasSize(1)
-            assertThat(state.trendingCoins).hasSize(1)
+            assertThat(state.coins).isEmpty()
+            assertThat(state.trendingCoins).isEmpty()
             assertThat(state.isLoading).isFalse()
-            assertThat(state.isTrendingLoading).isFalse()
+            assertThat(state.loadError).isNull()
+        }
+
+        // No use case should be called on init (only search query observer is set up)
+        coVerify(exactly = 0) { getCoinsUseCase(any()) }
+        coVerify(exactly = 0) { getTrendingCoinsUseCase() }
+    }
+
+    @Test
+    fun `handleAction RefreshData loads coins and trending coins in parallel successfully`() =
+        runTest {
+            // Given
+            val mockCoins = listOf(createMockCoin())
+            val mockTrendingCoins = listOf(createMockCoin(id = "ethereum"))
+
+            coEvery { getCoinsUseCase(any()) } returns flow {
+                emit(Result.success(mockCoins))
+            }
+            coEvery { getTrendingCoinsUseCase() } returns flow {
+                emit(Result.success(mockTrendingCoins))
+            }
+
+            viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
+
+            // When
+            viewModel.handleAction(HomeUiAction.RefreshData)
+            advanceUntilIdle()
+
+            // Then - Both should be loaded using combine (parallel)
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.coins).hasSize(1)
+                assertThat(state.trendingCoins).hasSize(1)
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.loadError).isNull()
+            }
+
+            coVerify(exactly = 1) { getCoinsUseCase(any()) }
+            coVerify(exactly = 1) { getTrendingCoinsUseCase() }
+        }
+
+    @Test
+    fun `handleAction RefreshData handles coins error correctly`() = runTest {
+        // Given
+        val exception = Exception("Network error")
+
+        coEvery { getCoinsUseCase(any()) } returns flow {
+            emit(Result.failure(exception))
+        }
+        coEvery { getTrendingCoinsUseCase() } returns flow {
+            emit(Result.failure(Exception("Trending error")))
+        }
+
+        viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
+
+        // When
+        viewModel.handleAction(HomeUiAction.RefreshData)
+        advanceUntilIdle()
+
+        // Then - When both fail, the last error is set
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.loadError).isNotNull()
+            // Due to combine, either error can be set depending on order
+            assertThat(state.coins).isEmpty()
+            assertThat(state.trendingCoins).isEmpty()
         }
 
         coVerify(exactly = 1) { getCoinsUseCase(any()) }
@@ -77,44 +135,21 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `handleAction LoadCoins updates state with coins`() = runTest {
+    fun `handleAction RefreshData handles trending error correctly`() = runTest {
         // Given
-        val mockCoins = listOf(createMockCoin(), createMockCoin(id = "ethereum"))
-        setupInitialMocks()
-        viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
-        advanceUntilIdle()
+        val exception = Exception("API error")
 
         coEvery { getCoinsUseCase(any()) } returns flow {
-            emit(Result.success(mockCoins))
+            emit(Result.success(emptyList()))
         }
-
-        // When
-        viewModel.handleAction(HomeUiAction.LoadCoins)
-        advanceUntilIdle()
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertThat(state.coins).hasSize(2)
-            assertThat(state.isLoading).isFalse()
-            assertThat(state.loadError).isNull()
-        }
-    }
-
-    @Test
-    fun `handleAction LoadCoins handles error correctly`() = runTest {
-        // Given
-        val exception = Exception("Network error")
-        setupInitialMocks()
-        viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
-        advanceUntilIdle()
-
-        coEvery { getCoinsUseCase(any()) } returns flow {
+        coEvery { getTrendingCoinsUseCase() } returns flow {
             emit(Result.failure(exception))
         }
 
+        viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
+
         // When
-        viewModel.handleAction(HomeUiAction.LoadCoins)
+        viewModel.handleAction(HomeUiAction.RefreshData)
         advanceUntilIdle()
 
         // Then
@@ -122,62 +157,11 @@ class HomeViewModelTest {
             val state = awaitItem()
             assertThat(state.isLoading).isFalse()
             assertThat(state.loadError).isNotNull()
-            assertThat(state.loadError?.message).isEqualTo("Network error")
-        }
-    }
-
-    @Test
-    fun `handleAction LoadTrendingCoins updates state with trending coins`() = runTest {
-        // Given
-        val mockTrendingCoins = listOf(
-            createMockCoin(id = "bitcoin"),
-            createMockCoin(id = "ethereum"),
-            createMockCoin(id = "cardano")
-        )
-        setupInitialMocks()
-        viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
-        advanceUntilIdle()
-
-        coEvery { getTrendingCoinsUseCase() } returns flow {
-            emit(Result.success(mockTrendingCoins))
+            assertThat(state.loadError?.message).isEqualTo("API error")
         }
 
-        // When
-        viewModel.handleAction(HomeUiAction.LoadTrendingCoins)
-        advanceUntilIdle()
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertThat(state.trendingCoins).hasSize(3)
-            assertThat(state.isTrendingLoading).isFalse()
-            assertThat(state.loadTrendingCoinsError).isNull()
-        }
-    }
-
-    @Test
-    fun `handleAction LoadTrendingCoins handles error correctly`() = runTest {
-        // Given
-        val exception = Exception("API error")
-        setupInitialMocks()
-        viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
-        advanceUntilIdle()
-
-        coEvery { getTrendingCoinsUseCase() } returns flow {
-            emit(Result.failure(exception))
-        }
-
-        // When
-        viewModel.handleAction(HomeUiAction.LoadTrendingCoins)
-        advanceUntilIdle()
-
-        // Then
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isTrendingLoading).isFalse()
-            assertThat(state.loadTrendingCoinsError).isNotNull()
-            assertThat(state.loadTrendingCoinsError?.message).isEqualTo("API error")
-        }
+        coVerify(exactly = 1) { getCoinsUseCase(any()) }
+        coVerify(exactly = 1) { getTrendingCoinsUseCase() }
     }
 
     @Test
@@ -269,7 +253,55 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `handleAction RefreshData refreshes both coins and trending in parallel`() = runTest {
+    fun `handleAction RefreshData reloads both coins and trending on subsequent calls`() = runTest {
+        // Given
+        val initialCoins = listOf(createMockCoin())
+        val initialTrending = listOf(createMockCoin(id = "ethereum"))
+
+        coEvery { getCoinsUseCase(any()) } returns flow {
+            emit(Result.success(initialCoins))
+        }
+        coEvery { getTrendingCoinsUseCase() } returns flow {
+            emit(Result.success(initialTrending))
+        }
+
+        viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
+
+        // First load
+        viewModel.handleAction(HomeUiAction.RefreshData)
+        advanceUntilIdle()
+
+        // Update mocks for refresh
+        val refreshedCoins = listOf(createMockCoin(), createMockCoin(id = "cardano"))
+        val refreshedTrending =
+            listOf(createMockCoin(id = "ethereum"), createMockCoin(id = "solana"))
+
+        coEvery { getCoinsUseCase(any()) } returns flow {
+            emit(Result.success(refreshedCoins))
+        }
+        coEvery { getTrendingCoinsUseCase() } returns flow {
+            emit(Result.success(refreshedTrending))
+        }
+
+        // When - Refresh
+        viewModel.handleAction(HomeUiAction.RefreshData)
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.coins).hasSize(2)
+            assertThat(state.trendingCoins).hasSize(2)
+            assertThat(state.isLoading).isFalse()
+        }
+
+        // Both should be called twice (first load + refresh)
+        coVerify(exactly = 2) { getCoinsUseCase(any()) }
+        coVerify(exactly = 2) { getTrendingCoinsUseCase() }
+    }
+
+    @Test
+    fun `handleAction RetryLoading calls loadCoinsAndTrending`() = runTest {
         // Given
         val mockCoins = listOf(createMockCoin())
         val mockTrendingCoins = listOf(createMockCoin(id = "ethereum"))
@@ -282,15 +314,20 @@ class HomeViewModelTest {
         }
 
         viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
-        advanceUntilIdle()
 
         // When
-        viewModel.handleAction(HomeUiAction.RefreshData)
+        viewModel.handleAction(HomeUiAction.RetryLoading)
         advanceUntilIdle()
 
-        // Then - Both should be called at least twice (init + refresh) using combine
-        coVerify(atLeast = 2) { getCoinsUseCase(any()) }
-        coVerify(atLeast = 2) { getTrendingCoinsUseCase() }
+        // Then
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.coins).hasSize(1)
+            assertThat(state.trendingCoins).hasSize(1)
+        }
+
+        coVerify(exactly = 1) { getCoinsUseCase(any()) }
+        coVerify(exactly = 1) { getTrendingCoinsUseCase() }
     }
 
     @Test
@@ -305,6 +342,8 @@ class HomeViewModelTest {
         }
 
         viewModel = HomeViewModel(getCoinsUseCase, getTrendingCoinsUseCase, searchCoinsUseCase)
+
+        viewModel.handleAction(HomeUiAction.RefreshData)
         advanceUntilIdle()
 
         // When
@@ -315,7 +354,6 @@ class HomeViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.loadError).isNull()
-            assertThat(state.loadTrendingCoinsError).isNull()
         }
     }
 
